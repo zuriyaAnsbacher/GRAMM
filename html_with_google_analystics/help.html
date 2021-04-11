@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-B6GFKCC3P8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-B6GFKCC3P8');
+    </script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <title>Help Page</title>
+    <style>
+        body {
+            background-image: url("../static/dna-struktur-rev.jpg");
+            background-repeat: no-repeat;
+            background-size: 100%
+        }
+
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('home')}}" style="font-size:20px;color:white">Home <span
+                        class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('example')}}" style="font-size:20px;color:white">Example <span
+                        class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('help')}}" style="font-size:20px;color:white">Help <span
+                        class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('about')}}" style="font-size:20px;color:white">About <span
+                        class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('races')}}" style="font-size:20px;color:white">Races <span
+                        class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<br>
+<div style="text-shadow: 2px 2px 15px white">
+    <h1 style="font-size:35px; color: #012457; padding-left: 20px">Help</h1>
+    <p style="padding-left: 40px;font-size: 15px;font-weight:700">The purpose of this website is to provide essential
+        information,<br>
+        to build lineage trees of haplotype inheritance from HLA typing of family members,<br>
+        and impute simultaneously the 5 locus haplotypes of all family members using the typing and the self reported
+        population.</p>
+
+    <p style="padding-left: 40px;font-size: 15px;font-weight:700">The website receives as input the HLA typing of
+        relatives in a nuclear family (parents and children),<br>
+        and calculates the parent's haplotypes. This information is then used to compute the descendant's haplotypes.
+    </p>
+
+    <p style="padding-left: 40px;font-size: 15px;font-weight:900">Input</p>
+    <p style="padding-left: 60px;font-size: 15px;font-weight:700">Single or several families, with HLA typing for
+        each family member.<br>
+        The input can be provided in two ways:
+    </p>
+    <ol style="padding-left: 100px;font-weight:700;font-size: 15px">
+
+        <li><b>csv file</b>, which includes data of a single family or several families. If your data contains several
+            families, this is the recommended option.<br>For an example
+            of a valid format, see "Example" label.<br>
+            The CSV is limited at the current time to 100 families.
+        </li>
+
+        <li><b>Manual insertion</b> in the website template.<br>
+            In this case, the insertion is for a single family at a time.
+        </li>
+    </ol>
+    <p style="padding-left: 40px;font-size: 15px;font-weight:900">Output</p>
+
+
+    <p style="padding-left: 60px;font-size: 15px;font-weight:700">After processing (which takes about a minute),<br> the
+        output downloads to
+        the computer as a zip directory, which contains these files:
+    </p>
+    <ol style="padding-left: 100px;font-weight:700;font-size: 15px">
+
+        <li><b>"results.csv"</b>: parent's haplotypes for each family that passed the process successfully.<br>
+            Each row is a possible result (max of 100 results for each family).<br>
+            If a family has several results, they will appear in descending probability order.<br>
+            In addition, in each row, the inheritance (of the children) are described.
+        </li>
+        <li>
+            ".png" files: visualizations of the results: 5 file (or less, if there are less families in the data) for
+            the first 5 families.
+            <br>The name of the file is the "FAMCODE" (index) of the family. (e.g. "1.png", "2.png"..)
+            <br>If a family has several results, there is a visualization to the first result only.
+        </li>
+        <li>
+            ".pfd" files: just like the ".png" file, in ".pdf" format. (e.g. "1.pdf", "2.pdf"..)
+        </li>
+        <li><b>"errors.txt"</b>: specifies families, that did not pass the process successfully, because one of the
+            following
+            reasons:<br>
+            Invalid data, or data that does not compatible for the process.<br>
+            Another reason to errors can be results that inconsistent with the whole family.<br>
+            In fact, the main reason for that is
+            <a href="https://en.wikipedia.org/wiki/Genetic_recombination" target="_blank">recombination.</a><br>
+            The file describes the failure reason for each family.
+        </li>
+        <li>In case of manual insertion, the zip contains the file: "user data in gl format.csv".<br>
+            This file includes the HLA data that the user submitted, in valid file format,<br>
+            so the user can use it for easy re-submission (by "Insertion by File").<br>
+            It can be useful when the user have to correct a mistake in the data: <br>
+            Instead of insert all the data manually, again, it can be fixed in file.
+        </li>
+    </ol>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-B6GFKCC3P8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-B6GFKCC3P8');
+    </script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <title>Example Page</title>
+    <style>
+        body {
+            background-image: url("../static/dna-struktur-rev.jpg");
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('home')}}" style="font-size:20px;color:white">Home <span
+                        class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('example')}}" style="font-size:20px;color:white">Example <span
+                        class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('help')}}" style="font-size:20px;color:white">Help <span
+                        class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('about')}}" style="font-size:20px;color:white">About <span
+                        class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('races')}}" style="font-size:20px;color:white">Races <span
+                        class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<br>
+<div style="text-shadow: 2px 2px 15px white;">
+    <h1 style="font-size:35px; color: #012457; padding-left: 20px">Example</h1>
+    <p style="padding-left: 40px;font-size: 15px;font-weight:700">A valid input file must be in one of the two following
+        options (csv format):
+    </p>
+    <ol>
+        <li>
+            <p style="padding-left: 60px;font-size: 15px;font-weight:700">12 columns with these headers:<br>FAMCODE,
+                BIRTHSEQ, A1,
+                A2, B1, B2, C1, C2, DRB11, DRB12, DQB11, DQB12
+            </p>
+            <ul style="padding-left: 100px;font-weight:700;font-size: 15px">
+                <li>FAMCODE: family index (starting from 1)</li>
+                <li>BIRTHSEQ: for father- F, for mother- M, for children – child index (starting from 1)</li>
+                <li>A1, A2, B1, … : HLA typing for each allele.<br>For example: high resolution: 02:01 ; low resolution:
+                    02 ; low
+                    resolution with letter codes: 02:AG ;<br> or leave empty (if you do not have data for allele)
+                </li>
+            </ul>
+            <p style="padding-left: 60px;font-size: 15px;font-weight:700">A simple example:</p>
+            <table class="table table-bordered"
+                   style="background:rgb(197, 210, 226);1px solid black;width:70%;margin-left:80px;font-size: 15px">
+                <thead>
+                <tr>
+                    <th scope="col">FAMCODE</th>
+                    <th scope="col">BIRTHSEQ</th>
+                    <th scope="col">A1</th>
+                    <th scope="col">A2</th>
+                    <th scope="col">B1</th>
+                    <th scope="col">B2</th>
+                    <th scope="col">C1</th>
+                    <th scope="col">C2</th>
+                    <th scope="col">DRB11</th>
+                    <th scope="col">DRB12</th>
+                    <th scope="col">DQB11</th>
+                    <th scope="col">DQB12</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>F</td>
+                    <td>02:01</td>
+                    <td>30:04</td>
+                    <td>40:01</td>
+                    <td>51:22</td>
+                    <td>03</td>
+                    <td>14</td>
+                    <td>04:01</td>
+                    <td>14:02</td>
+                    <td>03:02</td>
+                    <td>03:02</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>24:02</td>
+                    <td>02:01</td>
+                    <td></td>
+                    <td></td>
+                    <td>14:02</td>
+                    <td>06:02</td>
+                    <td>13:01</td>
+                    <td>04:01</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>02:01</td>
+                    <td>02:01</td>
+                    <td>40:01</td>
+                    <td>57:01</td>
+                    <td></td>
+                    <td></td>
+                    <td>04:01</td>
+                    <td>07:01</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>M</td>
+                    <td>03</td>
+                    <td>02</td>
+                    <td>07:02</td>
+                    <td>13:02</td>
+                    <td></td>
+                    <td></td>
+                    <td>15:01</td>
+                    <td>01:01</td>
+                    <td>06:02</td>
+                    <td>05:01</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>02:01</td>
+                    <td>01:CNJK</td>
+                    <td></td>
+                    <td></td>
+                    <td>04</td>
+                    <td>06</td>
+                    <td></td>
+                    <td></td>
+                    <td>02:01</td>
+                    <td>06:02</td>
+                </tr>
+
+                </tbody>
+            </table>
+            <!--            <p style="padding-left: 40px;font-size: 20px;font-weight:800">Note: HLA in low resolution has to be a-->
+            <!--                two-digit number-->
+            <!--                (valid: 03; invalid: 3)</p>-->
+        </li>
+        <br>
+        <li>
+            <p style="padding-left: 60px;font-size: 15px;font-weight:700">3 columns with these headers:<br>FAMCODE,
+                BIRTHSEQ, GLSTRING
+            </p>
+            <ul style="padding-left: 100px;font-weight:700;font-size: 15px">
+                <li>FAMCODE and BIRTHSEQ: as mentioned in section 1.</li>
+                <li>GLSTRING: HLA typing in gl string format:<br>A*___+A*___^B*___+B*___^C*___+C*___^DRB1*___+DRB1*___^DQB1*___+DQB1*___<br>
+                    For example:
+                    A*02:01+A*30:04^B*03:04+B*14:02^B*40:01+B*51:22^DRB1*04:01+DRB1*14:02^DQB1*03:02+DQB1*03:02<br>
+                    The gl string can be with missing data: A*02:01+A*30:04^B*40:01+B*51:22^DRB1*04:01+DRB1*14:02<br>
+                </li>
+            </ul>
+            <p style="padding-left: 60px;font-size: 15px;font-weight:700">A simple example:</p>
+            <table class="table table-bordered"
+                   style="background:rgb(197, 210, 226);1px solid black;width:70%;margin-left:80px;font-size: 15px">
+                <thead>
+                <tr>
+                    <th scope="col">FAMCODE</th>
+                    <th scope="col">BIRTHSEQ</th>
+                    <th scope="col">GLSTRING</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>F</td>
+                    <td>A*02:01+A*30:04^B*40:01+B*51:22^C*03+C*14^DRB1*04:01+DRB1*14:02^DQB1*03:02+DQB1*03:02</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>A*24:02+A*02:01^C*14:02+C*06:02^DRB1*13:01+DRB1*04:01</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>A*02:01+A*02:01^B*40:01+B*57:01^DRB1*04:01+DRB1*07:01</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>M</td>
+                    <td>A*03+A*02^B*07:02+B*13:02^DRB1*15:01+DRB1*01:01^DQB1*06:02+DQB1*05:01</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>A*02:01+A*01:CNJK^C*04+C*06^DQB1*02:01+DQB1*06:02</td>
+                </tr>
+
+                </tbody>
+            </table>
+        <li>
+            <p style="padding-left: 60px;font-size: 15px;font-weight:700">PED format (not recommend to users).
+                <br>10 columns with the headers: Family_ID, Individual_ID, Paternal_ID, Maternal_ID, Sex, Phenotype,
+                Hap1, Race1, Hap2, Race
+            </p>
+        </li>
+
+
+    </ol>
+    <br>
+    <p style="padding-left: 40px;font-size: 15px;font-weight:700">Each of the files above could contain an additional
+        column: 'RACE'.<br>
+        In this column, you can fill the known races about the family you insert.<br>
+        Format: uppercase, separated by '+'. Note: you have to fill the same races for each member of the family.<br>
+        You can fill races for some of the families and leave empty for the others (see "Download example of a valid
+        file - option 2, with races)<br>
+        List of all the races is available in "Races" section.<br>
+        An example which contains races:
+    <table class="table table-bordered"
+           style="background:rgb(197, 210, 226);solid-color: black;width:70%;margin-left:80px;font-size: 15px">
+        <thead>
+        <tr>
+            <th scope="col">FAMCODE</th>
+            <th scope="col">BIRTHSEQ</th>
+            <th scope="col">A1</th>
+            <th scope="col">A2</th>
+            <th scope="col">B1</th>
+            <th scope="col">B2</th>
+            <th scope="col">C1</th>
+            <th scope="col">C2</th>
+            <th scope="col">DRB11</th>
+            <th scope="col">DRB12</th>
+            <th scope="col">DQB11</th>
+            <th scope="col">DQB12</th>
+            <th scope="col">RACE</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>1</td>
+            <td>F</td>
+            <td>02:01</td>
+            <td>30:04</td>
+            <td>40:01</td>
+            <td>51:22</td>
+            <td>03</td>
+            <td>14</td>
+            <td>04:01</td>
+            <td>14:02</td>
+            <td>03:02</td>
+            <td>03:02</td>
+            <td>AAFA+AINDI+CAU</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>1</td>
+            <td>24:02</td>
+            <td>02:01</td>
+            <td></td>
+            <td></td>
+            <td>14:02</td>
+            <td>06:02</td>
+            <td>13:01</td>
+            <td>04:01</td>
+            <td></td>
+            <td></td>
+            <td>AAFA+AINDI+CAU</td>
+        </tr>
+        </tbody>
+
+    </table>
+
+    <ul style="padding-left: 100px;font-weight:700;font-size: 20px">
+        <li><a href="{{url_for('download_example1')}}" target="_blank">Download</a> example of a valid file - option 1
+        </li>
+        <li><a href="{{url_for('download_example2')}}" target="_blank">Download</a> example of a valid file - option 2
+        </li>
+        <li><a href="{{url_for('download_example1_with_races')}}" target="_blank">Download</a> example of a valid file -
+            option 1, with races
+        </li>
+        <li><a href="{{url_for('download_example2_with_races')}}" target="_blank">Download</a> example of a valid file -
+            option 2, with races
+        </li>
+    </ul>
+
+</div>
+
+</body>
+</html>
+
+

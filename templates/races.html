@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <title>Races Page</title>
+    <style>
+        body {
+            background-image: url("../static/dna-struktur-rev.jpg");
+            background-repeat: no-repeat;
+            background-size: 100%
+        }
+
+        .con_tables {
+            width: 100%;
+            height: 500px;
+        }
+
+        .left_table {
+            width: 33%;
+            float: left;
+            display: inline-table;
+        }
+
+        .middle_table {
+            width: 33%;
+            float: left;
+            display: inline-table;
+        }
+
+        .right_table {
+            width: 33%;
+            float: left;
+            display: inline-table;
+        }
+
+
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('home')}}" style="font-size:20px;color:white">Home <span
+                        class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('example')}}" style="font-size:20px;color:white">Example <span
+                        class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('help')}}" style="font-size:20px;color:white">Help <span
+                        class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('about')}}" style="font-size:20px;color:white">About <span
+                        class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('races')}}" style="font-size:20px;color:white">Races <span
+                        class="sr-only">(current)</span></a>
+            </li>
+
+        </ul>
+    </div>
+</nav>
+
+<br>
+<div style="text-shadow: 2px 2px 15px white">
+    <h1 style="font-size:35px; color: #012457; padding-left: 20px">Race Code Tables</h1>
+    <p style="padding-left: 40px;font-size: 15px;font-weight:700">
+        The following three tables map between the races description and their race code (that is used for the insertion
+        data).<br>
+        The first two tables describe American races, and the last describes Israeli races.<br>
+        In the Americans, The last five races are more general and contain sub-races.<br>
+        In the Israelis, most of the races are general (and contain sub-races).<br>
+    </p>
+    <div class="con_tables">
+        <div class="left_table">
+            <table class="table table-bordered"
+                   style="background:#C5D2E2;solid-color: black;width:450px;margin-left:40px;font-size: 15px">
+
+                <thead>
+                <tr>
+                    <th colspan="2" style="text-align: center">American Races</th>
+                </tr>
+                <tr>
+                    <th scope="col">Description</th>
+                    <th scope="col" style="width: 150px">Race Code</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>African American</td>
+                    <td>AAFA</td>
+                </tr>
+                <tr>
+                    <td>African</td>
+                    <td>AFB</td>
+                </tr>
+                <tr>
+                    <td>South Asian</td>
+                    <td>AINDI</td>
+                </tr>
+                <tr>
+                    <td>American Indian South or Central American</td>
+                    <td>AISC</td>
+                </tr>
+                <tr>
+                    <td>Alaska Native or Aleut</td>
+                    <td>ALANAM</td>
+                </tr>
+                <tr>
+                    <td>North American Indian</td>
+                    <td>AMIND</td>
+                </tr>
+                <tr>
+                    <td>Black Caribbean</td>
+                    <td>CARB</td>
+                </tr>
+                <tr>
+                    <td>Caribbean Hispanic</td>
+                    <td>CARHIS</td>
+                </tr>
+                <tr>
+                    <td>Caribbean Indian</td>
+                    <td>CARIBI</td>
+                </tr>
+                <tr>
+                    <td>Hawaiian or other Pacific Islander</td>
+                    <td>HAWI</td>
+                </tr>
+                <tr>
+                    <td>Filipino</td>
+                    <td>FILII</td>
+                </tr>
+                <tr>
+                    <td>Korean</td>
+                    <td>KORI</td>
+                </tr>
+                <tr>
+                    <td>Japanese</td>
+                    <td>JAPI</td>
+                </tr>
+                <tr>
+                    <td>Mexican or Chicano</td>
+                    <td>MSWHIS</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="middle_table">
+            <table class="table table-bordered"
+                   style="background:#C5D2E2;solid-color: black;width:500px;font-size: 15px">
+                <thead>
+                <tr>
+                    <th colspan="2" style="text-align: center">American Races</th>
+                </tr>
+                <tr>
+                    <th scope="col">Description</th>
+                    <th scope="col" style="width: 150px">Race Code</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>MidEast/No. Coast of Africa</td>
+                    <td>MENAFC</td>
+                </tr>
+                <!--                <tr>-->
+                <!--                    <td>?</td>-->
+                <!--                    <td>NAMER</td>-->
+                <!--                </tr>-->
+                <tr>
+                    <td>Chinese</td>
+                    <td>NCHI</td>
+                </tr>
+                <tr>
+                    <td>South/Cntrl Amer. Hisp.</td>
+                    <td>SCAHIS</td>
+                </tr>
+                <tr>
+                    <td>Black South or Central America</td>
+                    <td>SCAMB</td>
+                </tr>
+                <tr>
+                    <td>Other Southeast Asian</td>
+                    <td>SCSEAI</td>
+                </tr>
+                <tr>
+                    <td>Vietnamese</td>
+                    <td>VIET</td>
+                </tr>
+                <tr style="background-color: #bac6d5">
+                    <td>African American, African, Black Caribbean,Black South or Central America</td>
+                    <td>AFA</td>
+                </tr>
+                <tr style="background-color: #bac6d5">
+                    <td>South Asian, Filipino, Hawaiian or other Pacific Islander, Japanese,Chinese, Other Southeast
+                        Asian, Vietnamese
+                    </td>
+                    <td>API</td>
+                </tr>
+                <tr style="background-color: #bac6d5">
+                    <td>European Caucasian, MidEast/No. Coast of Africa</td>
+                    <td>CAU</td>
+                </tr>
+                <tr style="background-color: #bac6d5">
+                    <td>Mexican or Chicano, South/Cntrl Amer. Hisp., Caribbean Hispanic</td>
+                    <td>HIS</td>
+                </tr>
+                <tr style="background-color: #bac6d5">
+                    <td>Caribbean Indian, North American Indian, American Indian South or Central American, Alaska
+                        Native or Aleut
+                    </td>
+                    <td>NAM</td>
+                </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="right_table">
+            <table class="table table-bordered"
+                   style="background:#bac6d5;solid-color: black;width:500px;font-size: 15px;margin-left: 10px">
+                <thead style="background-color: #C5D2E2">
+                <tr>
+                    <th colspan="2" style="text-align: center">Israeli Races</th>
+                </tr>
+                <tr>
+                    <th scope="col">Description</th>
+                    <th scope="col" style="width: 150px">Race Code</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Afghanistan, Georgia, Bukhara, Bedouin,	Chile, India, Druze, Colombia, Kavkaz, Mexico, Armenia, Azerbaijan, Kazakhstan, Uzbekistan, Europe, Indian, Transilvenia, Pakistan, Tajikistan, Bourma, Singapur, Macedonia</td>
+                    <td>Kavkaz</td>
+                </tr>
+                <tr>
+                    <td>Israel ("Zabar"), USA, Romania, Hungary, Poland, Russia, England, Gremany, Syria, France, Ashkenaz, Ukraine, Egypt, Turkey, Bulgaria, Czech, Greece, Austria, Spain, Lithuania, Cyprus, Luxembourg, Mongolia, Malta</td>
+                    <td>Ashkenazi</td>
+                </tr>
+                <tr>
+                    <td>Ethiopia</td>
+                    <td>Ethiopian</td>
+                </tr>
+                <tr>
+                    <td>Marocco, Libya, Tunisia, Yemen, Iran, Iraq, Kurdistan, Algeria</td>
+                    <td>Sephardi</td>
+                </tr>
+                <tr>
+                    <td>Argentina, Lebanon, Philippines, Mizrahi, Uruguay, Belarus, Netherlands, Canada, Brazil, Latvia, Switzerland, Moldova, South_Africa, Italy, Yugoslavia, Belgium, Slovakia, Australia, Peru, China, Thailand, Irland, New_Zealand, Scotland, Denmark, Finland, Norway, Kirghizstan, Vietnam, Sweden, Japan, Estonia, Serbia, Zimbabwe, South_America, Albania, Croatia, Sudan, Venezuela, Portugal, Africa, Panama, Cherkess, Kuba, Korea, Slovenia, Equador, East_Europe, Guatemala, Costa_Rica, Nigeria, Bolivia, Iceland, Liberia, Indonesia, Other</td>
+                    <td>Others</td>
+                </tr>
+                <tr>
+                    <td>Arab</td>
+                    <td>Arab</td>
+                </tr>
+                <tr>
+                    <td>Israeli - unknown origin</td>
+                    <td>all</td>
+                </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+
+</div>
+
+
+</body>
+</html>
