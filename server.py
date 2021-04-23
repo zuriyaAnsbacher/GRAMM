@@ -101,6 +101,11 @@ def home():
                         # flash('No selected file')
                         # return redirect(request.url)
                     if f:
+                        # before receive new file, remove all the files
+                        # in order that won't be error from data that stay in system
+                        for filename in os.listdir(app.config['UPLOAD_FOLDER']):
+                            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
                         filename = secure_filename(f.filename)
                         path2f_old = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                         f.save(path2f_old)
@@ -247,11 +252,11 @@ def home():
             is_serology = False  # not need?
             races_manually = ''  # ?
             # remove the files in files_from_server
-            # if option1:  # check option 1/option2
-            #     for filename in os.listdir(app.config['UPLOAD_FOLDER']):
-            #         os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            # in error, remove all the files in order that won't be another error from data that stay in system
+            for filename in os.listdir(app.config['UPLOAD_FOLDER']):
+                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
     return render_template('home.html', error_message=error_message, select_f=select_f,
-                           select_m=select_m, send2user=False, gl_accepted=gl_accepted,  races_manually=races_manually)
+                           select_m=select_m, send2user=False, gl_accepted=gl_accepted, races_manually=races_manually)
 
 
 @app.route("/help")
