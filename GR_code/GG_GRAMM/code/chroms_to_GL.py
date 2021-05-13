@@ -54,8 +54,8 @@ def open_serology_options(c1f, c2f, c1m, c2m, types, s_dict):
 def single2high(als, types, amb_d, d_low2high):
     in_low2high = True
     # empty data
-    if als == 'UUUU' or als == '':
-        return ''.join([str(types), '*UUUU'])
+    if als == 'ZZZZ' or als == '':
+        return ''.join([str(types), '*ZZZZ'])
 
     # in high res. i.g: 01:02, return it without processing
     if als.count(':') == 1 and not str(als).endswith(':'):
@@ -136,18 +136,19 @@ def gl_cartesian_product_1empty(c, al_types):
 # create gl string to one person
 def gl_for_person(c1, c2, al_types, amb_d, is1empty, d_low2high):
     ignore_in_grimm = {}
+    al_types_copy = copy.deepcopy(al_types)
     for types in al_types:
         if (c1[types] == [] or c1[types] == ['']) and (c2[types] == [] or c2[types] == ['']):
             # no data about allele in 2 chroms
             del c1[types]
             del c2[types]
-            al_types.remove(types)
+            al_types_copy.remove(types)
             continue
         if c1[types] == [] or c1[types] == ['']:  # no data in this chrom but exist data in other chrom
-            c1[types] = ['UUUU']  # sign to GG_GRIMM
+            c1[types] = ['ZZZZ']  # sign to GG_GRIMM
             ignore_in_grimm[types] = -1
         elif c2[types] == [] or c2[types] == ['']:
-            c2[types] = ['UUUU']
+            c2[types] = ['ZZZZ']
             ignore_in_grimm[types] = -2
         if len(c1[types]) == 2 and c1[types] == c2[types] and not is1empty:
             # case of 2 same als in 2 chromo. divide 1 for each chromo
@@ -157,9 +158,9 @@ def gl_for_person(c1, c2, al_types, amb_d, is1empty, d_low2high):
             c2[types].clear()
             c2[types].append(second)
     if not is1empty:
-        options = gl_cartesian_product(c1, c2, al_types)
+        options = gl_cartesian_product(c1, c2, al_types_copy)
     else:
-        options = gl_cartesian_product_1empty(c1, al_types)
+        options = gl_cartesian_product_1empty(c1, al_types_copy)
     new_options = []
 
     for op in options:
@@ -195,8 +196,8 @@ def create_bin(al_types, c1, c2):
 
 # CHECK THIS FUNCTION
 # if in some allele, there is data only in one chromosome, delete the data from the full allele
-# that because GRIMM can not get data in this way (A*02:01+A*UUUU)
-# UUUU sign empty (no data)
+# that because GRIMM can not get data in this way (A*02:01+A*ZZZZ)
+# ZZZZ sign empty (no data)
 def delete_data_from_one_chromosome(c1, c2):
     for key, value in c1.items():
         if value == [''] and c2[key] != []:
@@ -239,6 +240,8 @@ def write2gl_file(gl_file, bin_d, id_, gl, binary, race_dict):
 def create_gl(father, mother, al_types, id_fam, amb_d, gl_file, bin_d, d_low2high, race_dict, is_ser, ser_dict_g2a):
     c1f, c2f, c1m, c2m = father.ch1, father.ch2, mother.ch1, mother.ch2
 
+    c1f, c2f, c1m, c2m, empty1f, empty1m = copy_full2empty(c1f, c2f, c1m, c2m)
+
     for c1, c2 in [(c1f, c2f), (c1m, c2m)]:
         delete_data_from_one_chromosome(c1, c2)
 
@@ -250,7 +253,6 @@ def create_gl(father, mother, al_types, id_fam, amb_d, gl_file, bin_d, d_low2hig
     if is_ser:
         open_serology_options(c1f, c2f, c1m, c2m, al_types, ser_dict_g2a)
 
-    c1f, c2f, c1m, c2m, empty1f, empty1m = copy_full2empty(c1f, c2f, c1m, c2m)
     gl_f = gl_for_person(c1f, c2f, al_types, amb_d, empty1f, d_low2high)
     gl_m = gl_for_person(c1m, c2m, al_types, amb_d, empty1m, d_low2high)
     write2gl_file(gl_file, bin_d, id_f, gl_f, bin_f, race_dict)
