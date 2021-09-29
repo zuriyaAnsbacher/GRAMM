@@ -32,7 +32,8 @@ def is_valid(fam_d, al_types, par_num):
         lst = Als()
         for key in fam_d:  # F, M, 1, 2...
             if any(fam_d[key][types]):  # not empty
-                lst = fam_d[key][types].merge(lst)
+                # lst = fam_d[key][types].merge(lst)
+                lst = lst.merge(fam_d[key][types])
         if len(lst) > 4:
             return "Too many alleles in the family."
     if par_num == 2:
@@ -78,7 +79,8 @@ def child_ls_merge(child_ls, child_d, types):
     lst = Als()
     for child in child_ls:
         if any(child_d[child][types]):
-            lst = child_d[child][types].merge(lst)
+            # lst = child_d[child][types].merge(lst)
+            lst = lst.merge(child_d[child][types])
     return lst
 
 

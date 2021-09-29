@@ -2,7 +2,7 @@ import re
 import csv
 import json
 
-from utils import convert_to_serology
+from general_aux_funs import convert_to_serology
 
 
 def get_families(user_file, aux_tools):
@@ -31,7 +31,7 @@ def get_families(user_file, aux_tools):
     for line in reader:
         id_family = line[0]
         id_person = line[1]
-        indv_alleles, data_exist = get_individual(line, aux_tools)
+        indv_alleles, data_exist = get_individual(line, aux_tools, id_family)
         if data_exist:
             if id_family not in families_dict:
                 families_dict[id_family] = {}  # create a sub dict to the family in families_dict
@@ -42,11 +42,12 @@ def get_families(user_file, aux_tools):
     return families_dict
 
 
-def get_individual(line, aux_tools):
+def get_individual(line, aux_tools, id_family):
     """
     get individual data
     :param line: line in file
     :param aux_tools: explained in "get_families" function
+    :param id_family: family index
     :return: individual data, and flag that equal to False if there is no data about this individual
     """
     indv_alleles = {}
@@ -55,7 +56,7 @@ def get_individual(line, aux_tools):
     alleles_map = {2: 'A', 4: 'B', 6: 'C', 8: 'DRB1', 10: 'DQB1'}
     for i in range(2, 11, 2):
         alleles_pair = line[i:i+2]
-        new_alleles_pair = process_alleles(alleles_pair, alleles_map[i], aux_tools)
+        new_alleles_pair = process_alleles(alleles_pair, alleles_map[i], aux_tools, id_family)
         indv_alleles[alleles_map[i]] = new_alleles_pair
     if not any(item for sublist in indv_alleles.values() for item in sublist):  # completely empty: {('',''),('','')..}
         data_exist = False
@@ -63,19 +64,20 @@ def get_individual(line, aux_tools):
     return indv_alleles, data_exist
 
 
-def process_alleles(pair, allele, aux_tools):
+def process_alleles(pair, allele, aux_tools, id_family):
     """
     process alleles: replace irrelevant characters, remove ambiguity (if exists) and save it to a dict,
     convert to serology if needed
     :param pair: alleles pair
     :param allele: the specific allele of this pair (A/B..)
     :param aux_tools: explained in "get_families" function
+    :param id_family: family index
     :return: alleles pair, after process
     """
     # TODO: add try-except and error message or error may not occurs?
     amb = aux_tools['amb']  # amb is a dict of ambiguity of alleles
     is_serology = aux_tools['is_serology']  # is_serology is boolean (serology samples or genetic)
-    ser_dict = aux_tools['ser_dict']  # ser_dict is a dict for the conversion to serology interpretation
+    ser_dict = aux_tools['antigen2group']  # ser_dict is a dict for the conversion to serology interpretation
 
     al1, al2 = pair[0], pair[1]
 
@@ -85,7 +87,12 @@ def process_alleles(pair, allele, aux_tools):
 
     new_als = []
     for al in [al1, al2]:
-        al = str(al).replace('p', '')
+        al = str(al).replace('p', '')  # is necessary? after we do re.sub to [a-zA-Z]
+
+        # more than 4 digits: 01:02:01 -> 01:02. we don't remove from the sixth char, because could be letters: 01:APCJ
+        if al.count(':') > 1:
+            parts = al.split(':')
+            al = ''.join([parts[0], ':', parts[1]])
 
         """
             Save the ambiguity in dict and remove it from al1, al2.
@@ -97,7 +104,9 @@ def process_alleles(pair, allele, aux_tools):
         #  (tiny probability that will be 2 relatives with same ambiguity).
         #  Maybe need - if I read the whole file at once?
         if ":" in al and al.split(':')[1].isupper():
-            amb[allele + '*' + al.split(':')[0]] = al.split(':')[1]
+            if id_family not in amb:
+                amb[id_family] = {}
+            amb[id_family][allele + '*' + al.split(':')[0]] = al.split(':')[1]
 
         al = re.sub('[a-zA-Z]', '', al)  # remove ambiguity
 

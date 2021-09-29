@@ -143,7 +143,7 @@ def divide_alleles_to_2_groups(dict_children_one_allele):
         children alleles, and insert in some order (no matter how) to the groups, until each group is of size 2
         for example: c1:[01, 01], c2:[01, 02], c3:[02, 03]
         -->(iter1) par1: 01, par2: 01  -->(iter2) par1: 01~02, par2: 01  -->(iter3) par1: 01~02, par2: 01~03
-        2. hard case: no homozygous child, so add the alleles of the first child, and then, for the others, call
+        2. difficult case: no homozygous child, so add the alleles of the first child, and then, for the others, call
         to 'divide_2_alleles_to_non_empty_groups'
     :param dict_children_one_allele: children dict, that contains data about one allele only
     :return: 2 groups
@@ -165,7 +165,6 @@ def divide_alleles_to_2_groups(dict_children_one_allele):
                 break
 
     else:  # no homozygous
-
         # 'try_again' let us know if one allele did not succeed to be inserted to the groups in first time, so after
         # insertion the other, we try to insert it again. more explanations in documentation of 'divide_2_alleles..'
         try_again = []
@@ -216,7 +215,6 @@ def insert_data_to_single_allele_in_par_haps(family, alleles_names, hapF, hapM, 
     :param errors_in_families: errors dict, for report if we dont find 4 different values
     """
 
-    problematic_child = 0  # TODO?
     success = False  # flag to know if we succeeded
     allele_inserted_to_parents = None  # the name of the allele that we insert the data (if we succeeded)
     # is_deter = True  # flag that =False if there are 2 children with 4 diff values,  #TODO: remove 'is_deter'
@@ -224,7 +222,7 @@ def insert_data_to_single_allele_in_par_haps(family, alleles_names, hapF, hapM, 
     # # it's important for a function later, that associate children with parents haplotypes
 
     children_keys = [k for k in family.keys() if k not in ['F', 'M']]
-    children = {k: family[k] for k in children_keys}  # get dub-dict of 'family', with only children
+    children = {k: family[k] for k in children_keys}  # get dub-dict of 'family', only with children
 
     for al_name in alleles_names:
         merged_allele_values = create_merged_allele_values(children, al_name)
@@ -283,7 +281,7 @@ def associate_children_to_par_haps_while_parents_dont_exist(hapF, hapM, child, a
     by list 'associating' we mark the haplotypes the child inherited (in first index: father hap, in second: mother)
 
     we handle with some cases:
-    1. child with no data about this allele (["", ""]) - cant associate
+    1. child with no data about this allele (["", ""]) - cannot be associated
     2. each value in child matches to a value in parents haps (f:01~02 m:03~04, c:[01,04], so associating: [1, 2])
     3. each value in child matches to 2 values in parents haps. it happened in specific scenario:
        in previous stage were 2 children with 4 different values, so we inserted them non-deterministically
@@ -293,14 +291,14 @@ def associate_children_to_par_haps_while_parents_dont_exist(hapF, hapM, child, a
             need associate with the child (in f: 1 or 2?).
             in this case, we check if it's the first child in the external loop, (by check if the rest of the haplotypes
             of this parent are empty). if so, we associate randomly (in index 1), because it doesnt matter.
-            but otherwise, we do not associate
+            but otherwise, we do not associate.
         4b. there is common value between the parents, and child has this value (f:01~02, m:02~03, c:[01, 02]),
             so first we associate with the parent with 1 match (m, in the example). then, we take the non-common
             allele (01) and check its index in the parent with the 2 matches.
     * other cases look impossible, but maybe I missed something. anyway, if we don't meet one of the conditions
-      above, the is no associating.
-      (about the cases: 2 parents homozygous (so 2 matches twice); child + 1 par are homoz' (so 1 match and 2 matches))
-      they shouldn't appear, because according the previous stage ('insert_data_to_single...') their insertion
+      above, there is no associating.
+      (about the cases: 2 parents homozygous (so 2 matches twice); or child + 1 par are homoz' (so 1 match and 2 matches))
+      they shouldn't appear, because according the previous stage ('insert_data_to_single...') ,their insertion
       couldn't happened.
     :param hapF: father haplotype
     :param hapM: mother haplotype
@@ -356,3 +354,4 @@ def associate_children_to_par_haps_while_parents_dont_exist(hapF, hapM, child, a
     success = True if all(associating) else False
 
     return success, associating
+

@@ -5,19 +5,21 @@ from os import path
 
 
 # create file from the data that the user inserted manually to web
-def add2file(file_path, famcode, A1_data, B1_data, C1_data, DRB11_data, DQB11_data, A2_data, B2_data, C2_data, DRB12_data, DQB12_data):
-    if famcode == "Father" or famcode == "Mother":
-        famcode = famcode[0]
+def add2file(files_folder, id_person, A1_data, B1_data, C1_data, DRB11_data, DQB11_data, A2_data, B2_data, C2_data,
+             DRB12_data, DQB12_data, temp_f):
 
-    if not path.exists(file_path + "/data2file.csv"):
-        with open(file_path + "/data2file.csv", 'w') as f1:
+    if id_person == "Father" or id_person == "Mother":
+        id_person = id_person[0]  # convert Father to F and Mother to M
+
+    if not path.exists(os.path.join(files_folder, temp_f)):
+        with open(os.path.join(files_folder, temp_f), 'w') as f1:
             writer1 = csv.writer(f1)
             writer1.writerow(["FAMCODE", "BIRTHSEQ", "A1", "A2", "B1", "B2", "C1", "C2", "DRB11", "DRB12", "DQB11", "DQB12"])
 
-    with open(file_path + "/data2file.csv", 'a+') as f2:
+    with open(os.path.join(files_folder, temp_f), 'a+') as f2:
         writer2 = csv.writer(f2)
         # pay attention the child must be 1, 2,...
-        row = ["1", famcode, A1_data, A2_data, B1_data, B2_data, C1_data, C2_data, DRB11_data, DRB12_data, DQB11_data, DQB12_data]
+        row = ["1", id_person, A1_data, A2_data, B1_data, B2_data, C1_data, C2_data, DRB11_data, DRB12_data, DQB11_data, DQB12_data]
         writer2.writerow(row)
 
 
@@ -193,20 +195,3 @@ def add_races_from_manual_insertion(race_str, race_dict):
         race_dict['1'] = race_str
     except:
         race_dict.clear()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

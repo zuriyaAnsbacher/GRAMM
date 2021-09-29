@@ -35,6 +35,8 @@ class Als(list):
         :param other: other Als list
         :return: true if equal, false otherwise
         """
+        if self is None or other is None:
+            return False
         if len(self) == len(other):  # a necessary condition for equality
             lst1 = [ele in other for ele in self]
             lst2 = [ele in self for ele in other]
@@ -62,7 +64,7 @@ class Als(list):
             new.append(ele)
         return new
 
-    def is_empty_a(self):  # (exists in "add_data_by_children" in lines 45, 47)
+    def empty_Als(self):  # (exists in "add_data_by_children" in lines 45, 47)
         """
         check if the Als is empty.
         this function is actually unnecessary, cause we can use: if len(obj) == 0, or: if not obj, to check if empty.
@@ -119,45 +121,50 @@ class Als(list):
         """
         merge 'other' to 'self', with no repetitions.
         for example, self = [01:02, 04], other = [01, 03:01], so return [01:02, 04, 03:01]
-        >> Note: we do not want repetitions **between** the two Als, but within each one - it could be.
-        for example, self = [02, 03], other = [01, 01] so return [02, 03, 01, 01]
-        (because the first 01 and the second 01 are different: they were inherited from different parents)
         :param other: Als
         :return: merged Als
         """
-        if len(self) == 0 or len(other) == 0:  # one empty, at least
-            lst = self + other
-            return lst
-
-        # 'other' has two identical values, so we want to add they both (see explanation in the function) comment
-        if other[0] == other[1] and other[0]:  # second condition for check that the values in 'other' are not empty
-            lst = self + other
-            return lst
 
         lst = self.copy_a()  # create a copy for not changing 'self'
+
+        if not any(other):  # other = ["", ""], so we dont have anything to add
+            return self
+
+        inter, _ = self.intersection(other)
+        if inter == 2:  # self = [01, 02, 03, 01], other = [01, 01]
+            return self
+
+        # 'other' has two identical values, so it's a special case
+        if other[0] == other[1] and other[0]:  # second condition for check that the values in 'other' are not empty
+            if other[0] in self:
+                lst.append(other[0])  # self: [01, 02], other: [02, 02], so lst: [01, 02, 02]
+            else:
+                lst.extend(other)  # self: [01, 02], other: [03, 03], so lst: [01, 02, 03, 03]
+            return lst
+
         for item in other:
             if item not in lst and item:  # second condition for not add empty value ("") to the merged lst
                 lst.append(item)
         return lst
 
-    # TODO: Im not sure what this function does. can match be only 0/1 or also 2? if it could be 2, it strange that m_par contain 1 index.
-    #  check it when I work on the functions that uses this.
-    def match_par(self, par):
-        match = 0
-        m_par = None
-        for ele in par:
-            if ele in self:
-                match += 1
-                m_par = par.index_a(ele)
-        return match, m_par
-
     def intersection(self, other):
+        """
+        find intersection between two Als. return the count of intersections, and the index
+        (if there are some, so return the last).
+        Note: we go over on 'other' and compare with 'self', so if other=[01,01], self=[01, 02], so intersections=2,
+        but if other=[01,02], self=[01,01] so intersections=1
+        :param other: Als
+        :return: intersections count, index of the intersection
+        """
         intersection_count = 0
         idx_intersection_in_other = None
+
+        # if 'self' or 'other' (or they both) are empty (["", ""]), consider as no intersection
+        if (not any(self)) or (not any(other)):
+            return intersection_count, idx_intersection_in_other
+
         for allele in other:
             if allele in self:
                 intersection_count += 1
                 idx_intersection_in_other = other.index_a(allele)  # if 2 intersections, idx will be the second
         return intersection_count, idx_intersection_in_other
-
-

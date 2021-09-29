@@ -14,17 +14,17 @@ def emb_wp(chF, chM, child_d, al_types):
     i = 0
     m_before = False
     flag = 0
-    first = True
+    first = True  # TODO: why define as True but after as 0/1?
     emb_FM = [0, 0]  # emb_FM signs which chromo of parents the child emb. if chF2, chM1: [2,1]
     pars = [chF, chM]
-    if not (empty_dict(chM.ch1) or empty_dict(chM.ch2)):  # if M full and F empty, begin with M
+    if not ( empty_dict(chM.ch1) or empty_dict(chM.ch2) ):  # if M full and F empty, begin with M
         pars = [chM, chF]
         m_before = True  # sign the opposite list. in the end of code - flip it
     for par in pars:
         was_emb = False
         if empty_dict(par.ch1) and empty_dict(par.ch2):
             emb_FM[i] = 1  # emb (random) in first chromo
-            was_emb = True
+            was_emb = True  # TODO: something here looks strange (not used)
         elif not (empty_dict(par.ch1) or empty_dict(par.ch2)):  # 2 chrom of par are full
             d1 = par.ch1
             d2 = par.ch2
@@ -37,7 +37,7 @@ def emb_wp(chF, chM, child_d, al_types):
                     if len(child_d[types]) == 2 and match == 1:
                         emb_FM[i] = m_par + 1
                         was_emb = True
-                        del_al = child_d[types][0] if child_d[types][0] in par_pair else child_d[types][1]
+                        del_al = child_d[types][0] if child_d[types][0] in par_pair else child_d[types][1]  # TODO: this the reason for creating copied dict
                         del child_d[types][child_d[types].index_a(del_al)]  # remove the emb allele
                     elif len(child_d[types]) == 1:  # child has 1 option to this allele (the first allele was embedded)
                         ind = par_pair.index_a(child_d[types][0])
@@ -49,7 +49,7 @@ def emb_wp(chF, chM, child_d, al_types):
                 i = i - 1
                 pars.append(par)  # add to more one running on this parents, to success the emb
 
-        else:  # 1 chrom full, one empty
+        else:  # 1 chrom full, one empty, (in this case we can embed only in the empty chrom, if the the full contradictory (if the full compatible we can't know certainly))
             full_d = par.ch1 if not empty_dict(par.ch1) else par.ch2
             full_ind = 0 if not empty_dict(par.ch1) else 1
             for types in al_types:

@@ -10,8 +10,12 @@ from GR_code.GG_GRAMM.code.add_data_by_children import add_data_child
 from GR_code.GG_GRAMM.code.chroms_to_GL import create_gl
 
 
-def run_GRAMM(input_path, alleles, output_path, is_serology, race_dict):
+def run_GRAMM(input_path, alleles, output_path, is_serology, race_dict, sim=False):
     cur_path = os.path.abspath("GR_code/GG_GRAMM")  # check that
+
+    if sim:
+        cur_path = '../GR_code/GG_GRAMM'  # remove. only for simulations
+
     gl_file = open(output_path + "/input_test.txt", 'w+')
     bin_path = output_path + "/bin_input_test.txt"
     errors_d = open(output_path + '/errors.txt', 'w')
@@ -20,17 +24,22 @@ def run_GRAMM(input_path, alleles, output_path, is_serology, race_dict):
     # and the *parent* with the empty haplotype. (happen in case of insertion 1 parent and 1 child)
     # i.g: {"2": "empty1f", "15": "empty1m"}.
     double_als = {}
+
     with open(cur_path + '/data/low2high.txt') as json_file:
         d_low2high = json.load(json_file)
-
-    # with open("/home/zuriya/PycharmProjects/GR_Web/GR_code/GG_GRAMM/data/low2high.txt") as json_file:
-    #     d_low2high = json.load(json_file)
 
     with open(cur_path + '/data/ser_dict_antigen2group.json') as ser_dict_path_anti2group:
         ser_dict_anti2group = json.load(ser_dict_path_anti2group)
 
     with open(cur_path + '/data/ser_dict_group2antigen.json') as ser_dict_path_group2anti:
         ser_dict_group2anti = json.load(ser_dict_path_group2anti)
+
+    # with open("/home/zuriya/PycharmProjects/GR_Web/GR_code/GG_GRAMM/data/low2high.txt") as json_file:
+    #     d_low2high = json.load(json_file)
+    # with open("/home/zuriya/PycharmProjects/GR_Web/GR_code/GG_GRAMM/data/ser_dict_antigen2group.json") as ser_dict_path_anti2group:
+    #     ser_dict_anti2group = json.load(ser_dict_path_anti2group)
+    # with open("/home/zuriya/PycharmProjects/GR_Web/GR_code/GG_GRAMM/data/ser_dict_antigen2group.json") as ser_dict_path_group2anti:
+    #     ser_dict_group2anti = json.load(ser_dict_path_group2anti)
 
     error1 = ''  # ?
     error2 = 'Less than 4 different alleles. Algorithm can not be executed'
@@ -81,15 +90,16 @@ def run_GRAMM(input_path, alleles, output_path, is_serology, race_dict):
                 type_emb, is_deter = emb_4als_in_pars(chF, chM, child_lst, children_d, al_types)
                 if not type_emb:
                     errors_report(errors_d, errors_count, 1, error2, family_ids[0])
-                    family_ids, family_als, par_num, amb = ddr.get_family(is_serology)
+                    family_ids, family_als, par_num, amb = ddr.get_family(is_serology, ser_dict_anti2group)
                     continue
             adding_child_failed = False
             for child in child_lst:
                 if par_num > 0:
-                    child_d = fam_dict[child].copy()  # d for specific child: {'A':[..], 'B':[..], ...}
+                    child_d = fam_dict[child].copy()  # d for specific child: {'A':[..], 'B':[..], ...}  # TODO: should be deepcopy?
                     emb_FM = emb_wp(chF, chM, child_d, al_types)
                 elif type_emb:  # no parents
-                    als_of_ty = children_d[child][type_emb].copy()
+                    # als_of_ty = children_d[child][type_emb].copy()
+                    als_of_ty = copy.deepcopy(children_d[child][type_emb])
                     f1, f2, m1, m2 = chF.ch1, chF.ch2, chM.ch1, chM.ch2
                     emb_FM = emb_np(type_emb, als_of_ty, is_deter, f1, f2, m1, m2)
                 if not emb_FM:
@@ -131,4 +141,8 @@ def run_GRAMM(input_path, alleles, output_path, is_serology, race_dict):
 
     return output_path + "/input_test.txt", bin_path, output_path + "/errors.txt", errors_count, double_als
 
-# run_GRAMM("/home/zuriya/PycharmProjects/GR_Web/GR_code/GG_GRAMM/input/EASY2cor2mis.csv", ['A', 'B', 'C', 'DRB1', 'DQB1'], "/home/zuriya/PycharmProjects/GR_Web/GR_code/GG_GRAMM/output")
+
+# from processing_data2input.processing import basic_csv2format
+# basic_csv2format("/home/zuriya/PycharmProjects/GR_Web/GR_code/GG_GRAMM/input/EASY_SIM.csv", "/home/zuriya/PycharmProjects/GR_Web/GR_code/GG_GRAMM/input/EASY_SIM_old_format.csv")
+# run_GRAMM("/home/zuriya/PycharmProjects/GR_Web/GR_code/GG_GRAMM/input/EASY_SIM_old_format.csv", ['A', 'B', 'C', 'DRB1', 'DQB1'],
+#           "/home/zuriya/PycharmProjects/GR_Web/GR_code/GG_GRAMM/output", False, {})

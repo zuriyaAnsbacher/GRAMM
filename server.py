@@ -118,6 +118,7 @@ def home():
                     # check if user inserted races, and add to race dict
                     add_races_from_manual_insertion(races_manually_temp, race_dict)
                     # convert file to a valid format
+                    # maybe not need here, if I create from the start as valid format?
                     basic_csv2format(app.config['UPLOAD_FOLDER'] + "/data2file.csv", app.config['UPLOAD_FOLDER'] + "/final_file.csv")
                     # os.remove(app.config['UPLOAD_FOLDER'] + "/data2file.csv")
                     path2f = app.config['UPLOAD_FOLDER'] + "/final_file.csv"
@@ -225,8 +226,8 @@ def home():
                 if famcode == "Child":
                     famcode = child_count
                     child_count += 1
-                add2file(app.config['UPLOAD_FOLDER'], famcode, A1_data, B1_data, C1_data, DRB1_data, DQB1_data, A2_data,
-                         B2_data, C2_data, DRB2_data, DQB2_data)
+                add2file(app.config['UPLOAD_FOLDER'], famcode, A1_data, B1_data, C1_data, DRB1_data,
+                         DQB1_data, A2_data, B2_data, C2_data, DRB2_data, DQB2_data, temp_f='data2file.csv')
             if request.form["submit_btn"] == "Clear family":  # clear the data about family
                 if os.path.isfile(app.config['UPLOAD_FOLDER'] + "/data2file.csv"):
                     os.remove(app.config['UPLOAD_FOLDER'] + "/data2file.csv")
@@ -320,5 +321,5 @@ def add_header(r):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
-    # app.run(debug=True, host='0.0.0.0')
+    # app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')

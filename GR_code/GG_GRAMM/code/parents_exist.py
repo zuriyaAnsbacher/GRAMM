@@ -1,4 +1,4 @@
-from aux_functions_update import empty_hap
+from general_aux_funs import empty_hap
 
 
 def associate_children_to_par_haps_while_parents_exist(hapF, hapM, child, alleles_names):

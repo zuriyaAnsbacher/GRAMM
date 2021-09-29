@@ -157,7 +157,7 @@ def check_if_there_is_allele_with_4_diff_values(fam_d, alleles_names, invalid_ca
                 # but it's not matter, because just need the values amount
                 alleles_values = alleles_values.merge(child_alleles)
         # after go over on all the children values in the current allele, check if there are 4 values
-        if alleles_values == 4:
+        if len(alleles_values) == 4:
             four_different_values = True
 
     if not four_different_values:

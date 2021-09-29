@@ -20,7 +20,7 @@ def data_pc_22(al_p, al_c, j, fm_in, fm_out, types):
         al_p2.append(al_p[1 - ind_p])
         al_p.remove_a(al_p2[0])  # remove from par different allele
         al_c.remove_a(al_p[0])  # remove from child same allele
-        c2_inpar = fm_out[j][types] if fm_out[j] else None # the second chromo in cur par
+        c2_inpar = fm_out[j][types] if fm_out[j] else None  # the second chromo in cur par
         c2_outpar = fm_in[1 - j][types] if fm_in[1 - j] else None  # the second chromo in other par (that child inheritance)
         # try
         checker = fm_out[1 - j][types] if fm_out[1 - j] else None  # avoid case of incorrect deletion
@@ -36,7 +36,7 @@ def add_data_child(child, chF, chM, emb_FM, al_types, d_chi):
     #     fm_in, fm_out = [m_in, f_in], [m_out, f_out]
     j = 0  # j = which iteration in pars loop
     for chr_par in fm_in:
-        if not chr_par:
+        if not chr_par:  # TODO: Im not sure it could be True (maybe yes..)
             j += 1
             continue
         for types in al_types:
@@ -65,10 +65,10 @@ def add_data_child(child, chF, chM, emb_FM, al_types, d_chi):
                 if al_c[0] not in al_p:
                     return None, None
                 if equal_al(al_p[0], al_p[1]) and al_p[0] != al_p[1]:
-                    if len(al_c[0]) == 2 and equal_al(al_p[0], al_c[0]):  # e.g 01:02, 01:03
+                    if len(al_c[0]) == 2 and equal_al(al_p[0], al_c[0]):  # e.g 01:02, 01:03  # TODO: it's not a good example! because they aren't equal
                         continue
                 ind_p = al_p.index_a(al_c[0])
-                al_p[ind_p] = high_res(al_p[ind_p], al_c[0])  # high res
+                al_p[ind_p] = high_res(al_p[ind_p], al_c[0])  # high res  # TODO: why not chr_par[types] = ... ?
                 al_p2 = Als()
                 al_p2.append(al_p[1 - ind_p])
                 al_p.remove_a(al_p2[0])

@@ -121,11 +121,12 @@ def emb_np(types, als_of_ty, is_deter, f1, f2, m1, m2):
     @param m2: second chromosome of mother
     @return: list (len 2). first index - which chromosome child inherited from f (1/2), second - from m.
     """
+    # TODO: what about children without data in this allele?
     emb_FM = [0, 0]  # emb_FM signs which chromo of parents the child emb. if chF2, chM1: [2,1]
     f_als = f1[types] + f2[types]
     m_als = m1[types] + m2[types]
     als_par = f_als + m_als
-    is_ex, homoz = exist_homoz_l(als_par)
+    is_ex, homoz = exist_homoz_l(als_par)  # TODO: but in als_par there are 4 alleles, no?
     if is_ex and homoz in als_of_ty:  # if was embed homozygous and this al exist in child
         del als_of_ty[als_of_ty.index_a(homoz)]  # remove homoz' and emb the second al
         if als_of_ty[0] in f_als:
@@ -137,7 +138,7 @@ def emb_np(types, als_of_ty, is_deter, f1, f2, m1, m2):
         ind2 = als_par.index_a(als_of_ty[1])
         emb_FM = [min(ind1, ind2) + 1, max(ind1, ind2) - 1]
         if not is_deter:  # e.g: f[01][02,03] m[08][02,03]
-            ind1, ind2 = fix_indexes(ind1, ind2)
+            ind1, ind2 = fix_indexes(ind1, ind2)  # TODO: it doesnt work well in some cases
             emb_FM = [ind1, ind2]
     was_emd = True
     return emb_FM

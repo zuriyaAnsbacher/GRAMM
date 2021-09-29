@@ -101,7 +101,7 @@ class simReader:
                     # identical child - ignore from one of them
                     index_ind = family_als.index(ind) if ind in family_als else -1
                     if index_ind == -1 or not (isinstance(seq, (int, float))) \
-                            or not (isinstance(family_ids[index_ind + 1], (int, float))):
+                            or not (isinstance(family_ids[index_ind + 1], (int, float))): # the second and third conditions are for cases of parents that identical to child (dont ignore in this case)
                         family_als.append(ind)
                         family_ids.append(seq)
             else:
@@ -122,9 +122,9 @@ class simReader:
         seq = line[1]  # individual seq number ID
         ind = []
         if len(line[-1]) > 1 and line[-1][-1] == '\n':
-            line[-1] = line[-1][:-1]
+            line[-1] = line[-1][:-1]  # in case that the last item is allele_num\n, remove \n (e.g 03/n -> 03)
         temp_d = {2: 'A', 6: 'B', 10: 'C', 14: 'DRB1', 18: 'DQB1'}
-        for i in range(2, 21, 4):
+        for i in range(2, 21, 4):  # from third ind until the last, with jump of 4 (e.g ['1', 'F', 02:01, 30:04, '', '', ..] -> get [02:01, 30:04, '', ''] in the first running
             val = line[i:i+4]
             data_pair = list(self.extract_als(val, amb, temp_d[i], is_serology, ser_dict))
             ind.append(data_pair)  # adding individual's alleles
