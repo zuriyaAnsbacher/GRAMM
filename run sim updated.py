@@ -182,44 +182,21 @@ def check_if_first_pred_equal_to_sim_GRIMM(sim_file, grimm_pred, skip_sim_header
 
     # build dict that contains the first result from preds
     for line in pred_reader:
-        # if line[0][0] == '1':  # children. we do not check them
-        #     break
         if line[0] not in pred_dict:  # save first result only
             pred_dict[line[0]] = [line[1], line[2]]  # hap1, hap2
 
     for line in sim_reader:
-        # if line[1][0] == '1':  # children. we do not check them
-        #     break
+        id_fam_indv = ''.join([line[0].lstrip('0'), '~', line[1].lstrip('0')])
 
-        if line[1][0] == '1':
-            id_F = ''.join([line[0].lstrip('0'), '~', line[2].lstrip('0')])
-            id_M = ''.join([line[0].lstrip('0'), '~', line[3].lstrip('0')])
+        hap1_sim, hap2_sim = clean_gl(line[6]), clean_gl(line[8])
 
-            hap1_sim, hap2_sim = clean_gl(line[6]), clean_gl(line[8])
+        if id_fam_indv in pred_dict:
+            hap1_pred, hap2_pred = pred_dict[id_fam_indv][0], pred_dict[id_fam_indv][1]
 
-            if id_F in pred_dict and id_M in pred_dict:
-                hap1F_pred, hap2F_pred = pred_dict[id_F][0], pred_dict[id_F][1]
-                hap1M_pred, hap2M_pred = pred_dict[id_M][0], pred_dict[id_M][1]
-
-                if ((hap1_sim == hap1F_pred or hap1_sim == hap2F_pred) and
-                    (hap2_sim == hap1M_pred or hap2_sim == hap2M_pred)) or ((hap2_sim == hap1F_pred or hap2_sim == hap2F_pred)
-                                                                            and (hap1_sim == hap1M_pred or hap1_sim == hap2M_pred)):
-                    conclusion['right'] += 1
-                else:
-                    conclusion['error'] += 1
-
-        else:
-            id_fam_indv = ''.join([line[0].lstrip('0'), '~', line[1].lstrip('0')])
-
-            hap1_sim, hap2_sim = clean_gl(line[6]), clean_gl(line[8])
-
-            if id_fam_indv in pred_dict:
-                hap1_pred, hap2_pred = pred_dict[id_fam_indv][0], pred_dict[id_fam_indv][1]
-
-                if (hap1_sim == hap1_pred and hap2_sim == hap2_pred) or (hap1_sim == hap2_pred and hap2_sim == hap1_pred):
-                    conclusion['right'] += 1
-                else:
-                    conclusion['error'] += 1
+            if (hap1_sim == hap1_pred and hap2_sim == hap2_pred) or (hap1_sim == hap2_pred and hap2_sim == hap1_pred):
+                conclusion['right'] += 1
+            else:
+                conclusion['error'] += 1
 
 
     sim.close()
@@ -228,50 +205,54 @@ def check_if_first_pred_equal_to_sim_GRIMM(sim_file, grimm_pred, skip_sim_header
     return conclusion
 
 
-# def check_if_exist_pred_equal_to_sim_GRIMM(sim_file, grimm_pred, skip_sim_headers):
-#     conclusion = {'right': 0, 'error': 0}
-#
-#     sim, pred = open(sim_file, 'r'), open(grimm_pred, 'r')
-#     sim_reader, pred_reader = csv.reader(sim), csv.reader(pred)
-#
-#     csv.field_size_limit(100000000)  # add it because limitation in csv
-#
-#     if skip_sim_headers:
-#         next(sim_reader, None)  # skip headers
-#
-#     pred_dict = {}
-#
-#     # build dict that contains the first result from preds
-#     for line in pred_reader:
-#         # if line[0][0] == '1':  # children. we do not check them
-#         #     break
-#         if line[0] not in pred_dict:  # save first result only
-#             pred_dict[line[0]] = [line[1], line[2]]  # hap1, hap2
-#
-#     for line in sim_reader:
-#         if line[1][0] == '1':  # children. we do not check them
-#             break
-#
-#         # id_fam_indv = ''.join([line[0].lstrip('0'), '~', line[1].lstrip('0')])
-#         if int(line[1].lstrip('0')) % 2 == 1:
-#             id_fam_indv = ''.join([line[0].lstrip('0'), '.0'])
-#         else:
-#             id_fam_indv = ''.join([line[0].lstrip('0'), '.1'])
-#
-#         hap1_sim, hap2_sim = clean_gl(line[6]), clean_gl(line[8])
-#
-#         if id_fam_indv in pred_dict:
-#             hap1_pred, hap2_pred = pred_dict[id_fam_indv][0], pred_dict[id_fam_indv][1]
-#
-#             if (hap1_sim == hap1_pred and hap2_sim == hap2_pred) or (hap1_sim == hap2_pred and hap2_sim == hap1_pred):  #todo: CHANGE LIKE IN GRAMM
-#                 conclusion['right'] += 1
-#             else:
-#                 conclusion['error'] += 1
-#
-#     sim.close()
-#     pred.close()
-#
-#     return conclusion
+def check_if_exist_pred_equal_to_sim_GRIMM(sim_file, grimm_pred, skip_sim_headers):
+    conclusion = {'right': 0, 'error': 0}
+
+    sim, pred = open(sim_file, 'r'), open(grimm_pred, 'r')
+    sim_reader, pred_reader = csv.reader(sim), csv.reader(pred)
+
+    csv.field_size_limit(100000000)  # add it because limitation in csv
+
+    if skip_sim_headers:
+        next(sim_reader, None)  # skip headers
+
+    pred_dict = {}
+
+    # build dict that contains the first result from preds
+    for line in pred_reader:
+        if line[0] not in pred_dict:  # save first result only
+            pred_dict[line[0]] = [[line[1], line[2]]]  # hap1, hap2
+        else:
+            pred_dict[line[0]].append([line[1], line[2]])
+
+    for line in sim_reader:
+        id_fam_indv = ''.join([line[0].lstrip('0'), '~', line[1].lstrip('0')])
+
+        # hap1_sim, hap2_sim = clean_gl(line[6]), clean_gl(line[8])
+        # if id_fam_indv in pred_dict:
+        #     hap1_pred, hap2_pred = pred_dict[id_fam_indv][0], pred_dict[id_fam_indv][1]
+        #
+        #     if (hap1_sim == hap1_pred and hap2_sim == hap2_pred) or (hap1_sim == hap2_pred and hap2_sim == hap1_pred):
+        #         conclusion['right'] += 1
+        #     else:
+        #         conclusion['error'] += 1
+
+        if id_fam_indv in pred_dict:
+            correct_pred_exist = False
+            hap1_sim, hap2_sim = clean_gl(line[6]), clean_gl(line[8])
+            for option in pred_dict[id_fam_indv]:
+                hap1_pred, hap2_pred = clean_gl(option[0]), clean_gl(option[1])
+                if (hap1_sim == hap1_pred and hap2_sim == hap2_pred) or (hap1_sim == hap2_pred and hap2_sim == hap1_pred):
+                    conclusion['right'] += 1
+                    correct_pred_exist = True
+                    break  # we just need to check if there is 1 correct option at least
+            if not correct_pred_exist:
+                conclusion['error'] += 1
+
+    sim.close()
+    pred.close()
+
+    return conclusion
 
 
 def compare_to_true_what_freq_of_right_res(sim_file, gramm_pred, skip_sim_headers):
@@ -326,23 +307,25 @@ def get_sim_file_with_persons_passed_successfully_gramm_running(orig_sim, out_fr
         if int(fam_id) in success_idx:
             indv_id = row[1].lstrip('0')
             id_fam_indv = ''.join([fam_id, '~', indv_id])
-            writer.writerow([id_fam_indv, row[5]])
+            writer.writerow([id_fam_indv, row[5], 'CAU', 'CAU'])
 
     sim.close()
     new_file.close()
 
 
 def main():
-    cur_sim = "EASY"
+    cur_sim = "MM"
     skip_headers = True
     # if cur_sim in ["HARD", "HARDER", 'HARD_MINI']:
     #     skip_headers = False  # no header in HARD and HARDER simulations files
     # deal the error - flag about not check them
     # results = run_gramm_code(f'running for GRAMM paper/simulations/PEDIGREE_HAPLO_MASTER_{cur_sim}.csv')
     # results = run_gramm_code(f'running for GRAMM paper/cordmom/cordmom_mini/cordmom_{cur_sim}.csv')
-    # get_sim_file_with_persons_passed_successfully_gramm_running(f'./simulations/PEDIGREE_HAPLO_MASTER_{cur_sim}.csv',
-    #                                                                        f'./output_from_web_running/results_{cur_sim}.csv',
-    #                                                                        f'./files_to_sapir_for_grimm_run/{cur_sim}.csv', skip_headers)
+
+    # get_sim_file_with_persons_passed_successfully_gramm_running(f'running for GRAMM paper/simulations/PEDIGREE_HAPLO_MASTER_{cur_sim}.csv',
+    #                                                                        f'running for GRAMM paper/output_from_web_running/new_version/results_{cur_sim}.csv',
+    #                                                                        f'running for GRAMM paper/files_to_sapir_for_grimm_run/new_version/{cur_sim}.csv', skip_headers)
+
     # add_race_CAU(f'./files_to_sapir_for_grimm_run/{cur_sim}.csv',  f'./files_to_sapir_for_grimm_run/{cur_sim}_new.csv')
 
     # move('running for GRAMM paper/files in runtime/results.csv',
@@ -356,6 +339,9 @@ def main():
     #      f'running for GRAMM paper/output_from_web_running/cordmom_mini/errors_cordmom_{cur_sim}.txt')
 
 
+    """
+    >>> GRAMM - first and exist
+    """
     # right_and_error_gramm = check_if_first_pred_equal_to_sim_GRAMM(
     #     f'running for GRAMM paper/simulations/PEDIGREE_HAPLO_MASTER_{cur_sim}.csv',
     #     f'running for GRAMM paper/output_from_web_running/new_version/results_{cur_sim}.csv', skip_headers)
@@ -363,27 +349,22 @@ def main():
     # right_and_error_gramm_exist = check_if_exist_pred_equal_to_sim_GRAMM(
     #     f'running for GRAMM paper/simulations/PEDIGREE_HAPLO_MASTER_{cur_sim}.csv',
     #     f'running for GRAMM paper/output_from_web_running/new_version/results_{cur_sim}.csv', skip_headers)
-
-    # right_and_error_gramm = check_if_first_pred_equal_to_sim_GRAMM(
-    #     f'running for GRAMM paper/cordmom/cordmom_mini/cordmom_{cur_sim}.csv',
-    #     f'running for GRAMM paper/output_from_web_running/cordmom_mini/results_cordmom_{cur_sim}.csv', skip_headers)
     #
-    # right_and_error_gramm_exist = check_if_exist_pred_equal_to_sim_GRAMM(
-    #     f'running for GRAMM paper/cordmom/cordmom_mini/cordmom_{cur_sim}.csv',
-    #     f'running for GRAMM paper/output_from_web_running/cordmom_mini/errors_cordmom_{cur_sim}.txt', skip_headers)
-
-    # print(right_and_error_gramm)
-    right_and_error_grimm = check_if_first_pred_equal_to_sim_GRIMM(f'running for GRAMM paper/simulations/PEDIGREE_HAPLO_MASTER_{cur_sim}.csv',
-                                                             f'running for GRAMM paper/grimm_output_from_sapir/{cur_sim}.hap.freqs',
-                                                             skip_headers)
-    print(right_and_error_grimm)
-
-    # right_and_error_grimm = check_if_first_pred_equal_to_sim_GRIMM(f'simulations/PEDIGREE_HAPLO_MASTER_{cur_sim}.csv',
-    #                                                                '/home/zuriya/PycharmProjects/GR_Web/GR_code/GG_GRIMM/validation/output/test.hap.freqs',
-    #                                                                skip_headers)
     # print(right_and_error_gramm)
     # print(right_and_error_gramm_exist)
 
+
+    """ 
+    >> GRIMM - first and exist
+    """
+    right_and_error_grimm = check_if_first_pred_equal_to_sim_GRIMM(f'running for GRAMM paper/simulations/PEDIGREE_HAPLO_MASTER_{cur_sim}.csv',
+                                                             f'running for GRAMM paper/grimm_output_from_sapir/{cur_sim}.hap.freqs',
+                                                             skip_headers)
+    right_and_error_grimm_exist = check_if_exist_pred_equal_to_sim_GRIMM(f'running for GRAMM paper/simulations/PEDIGREE_HAPLO_MASTER_{cur_sim}.csv',
+                                                             f'running for GRAMM paper/grimm_output_from_sapir/{cur_sim}.hap.freqs',
+                                                             skip_headers)
+    print(right_and_error_grimm)
+    print(right_and_error_grimm_exist)
 
 main()
 
