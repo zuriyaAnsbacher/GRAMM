@@ -357,14 +357,14 @@ def main():
     """ 
     >> GRIMM - first and exist
     """
-    right_and_error_grimm = check_if_first_pred_equal_to_sim_GRIMM(f'running for GRAMM paper/simulations/PEDIGREE_HAPLO_MASTER_{cur_sim}.csv',
-                                                             f'running for GRAMM paper/grimm_output_from_sapir/{cur_sim}.hap.freqs',
-                                                             skip_headers)
-    right_and_error_grimm_exist = check_if_exist_pred_equal_to_sim_GRIMM(f'running for GRAMM paper/simulations/PEDIGREE_HAPLO_MASTER_{cur_sim}.csv',
-                                                             f'running for GRAMM paper/grimm_output_from_sapir/{cur_sim}.hap.freqs',
-                                                             skip_headers)
-    print(right_and_error_grimm)
-    print(right_and_error_grimm_exist)
+    # right_and_error_grimm = check_if_first_pred_equal_to_sim_GRIMM(f'running for GRAMM paper/simulations/PEDIGREE_HAPLO_MASTER_{cur_sim}.csv',
+    #                                                          f'running for GRAMM paper/grimm_output_from_sapir/{cur_sim}.hap.freqs',
+    #                                                          skip_headers)
+    # right_and_error_grimm_exist = check_if_exist_pred_equal_to_sim_GRIMM(f'running for GRAMM paper/simulations/PEDIGREE_HAPLO_MASTER_{cur_sim}.csv',
+    #                                                          f'running for GRAMM paper/grimm_output_from_sapir/{cur_sim}.hap.freqs',
+    #                                                          skip_headers)
+    # print(right_and_error_grimm)
+    # print(right_and_error_grimm_exist)
 
 main()
 
