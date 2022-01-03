@@ -1,5 +1,6 @@
-from GR_code.GG_GRAMM.code.aux_functions import equal_al
+from GR_code.GG_GRAMM.code.aux_functions_oldVersion import equal_al
 
+# old version
 
 class Als(list):
     def __init__(self):

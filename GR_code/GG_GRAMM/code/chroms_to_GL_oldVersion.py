@@ -2,8 +2,10 @@ import os
 import copy
 import itertools
 import json
-from GR_code.GG_GRAMM.code.aux_functions import empty_dict
+from GR_code.GG_GRAMM.code.aux_functions_oldVersion import empty_dict
 
+
+# old version
 
 # if par has 1 full 1 empty (chromo), duplicate the full (for GG_GRIMM) and sign it (by f_dupl/m_dupl)
 def copy_full2empty(c1f, c2f, c1m, c2m):
@@ -70,7 +72,7 @@ def single2high(als, types, amb_d, d_low2high):
 
     # ambiguity, i.g: 02:APC (in the code its 02:)
     elif str(als).endswith(':'):
-        # amb_d contain the ambiguity of alleles in cur family that removed before
+        # amb_d contain the ambiguity of alleles_names in cur family that removed before
         # i.g:  in data: A*02:APC , after remove: 02: , in amb_d: {"A*02": APC}
         ambiguity = amb_d[types + '*' + als.rstrip(':')]
         try:
@@ -164,7 +166,7 @@ def gl_for_person(c1, c2, al_types, amb_d, is1empty, d_low2high):
     new_options = []
 
     for op in options:
-        j = 0  # index to types
+        j = 0  # index to alleles_names
         new_op = []
         for pair in op:
             al1 = single2high(pair.split('+')[0], al_types[j], amb_d, d_low2high)  # each allele: from low to high
@@ -181,7 +183,7 @@ def gl_for_person(c1, c2, al_types, amb_d, is1empty, d_low2high):
 
 def create_bin(al_types, c1, c2):
     # binary1 is 0/1 for each allele (al1, al2..)
-    # binary2 is 0/1 for pair alleles (al1->al2, al2->al3...)
+    # binary2 is 0/1 for pair alleles_names (al1->al2, al2->al3...)
     binary1 = [0] * len(al_types)
     i = 0
     for types in al_types:
@@ -208,12 +210,12 @@ def delete_data_from_one_chromosome(c1, c2):
 
 # def create_bin(al_types, c1, c2):
 #     # binary1 is 0/1 for each allele (al1, al2..)
-#     # binary2 is 0/1 for pair alleles (al1->al2, al2->al3...)
+#     # binary2 is 0/1 for pair alleles_names (al1->al2, al2->al3...)
 #     binary1 = [0] * len(al_types)
 #     binary2 = [0] * (len(al_types) - 1)
 #     i = 0
-#     for types in al_types:
-#         if len(c1[types]) == 2 and c1[types] == c2[types]:
+#     for alleles_names in al_types:
+#         if len(c1[alleles_names]) == 2 and c1[alleles_names] == c2[alleles_names]:
 #             binary1[i] = 1
 #         i += 1
 #     for j in range(len(binary2)):

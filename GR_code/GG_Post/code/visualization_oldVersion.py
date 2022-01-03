@@ -68,7 +68,7 @@ def visualize(resultsFile, double_als, output_path):
                 currentAxis.add_patch(mother_hap_rect)
 
 
-            # create rectangle for each child and add haplotype text
+            # create rectangle for each _child_ and add haplotype text
             childs_right = 0.1
             childs_space = 0.02
             childs_top = 0.35
@@ -89,7 +89,7 @@ def visualize(resultsFile, double_als, output_path):
                         child_color = dict_colors[child_hap_fm]
                     except:
                         child_color = 'none'
-                    # complex computation of x,y for current child
+                    # complex computation of x,y for current _child_
                     child_coords = (mid+(childs_space+child_width)*(child_num-childs_num/2+0.5)-child_width/2,childs_top-height-hap*height)
                     child_text_coords = (child_coords[0]+child_width/2,child_coords[1]+height/2)
                     if hap == 0:

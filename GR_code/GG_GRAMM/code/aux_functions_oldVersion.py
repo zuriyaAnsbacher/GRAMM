@@ -1,3 +1,6 @@
+
+# old version
+
 def equal_al(al_1, al_2):
     """
     :param al_1: first allele
@@ -43,7 +46,7 @@ def who_fuller(d1, d2):
 
 def sep_child_chro(spec_d, cur_ls):
     """
-    organize alleles to 4 parameters, instead of list
+    organize alleles_names to 4 parameters, instead of list
     @param spec_d: dict children
     @param cur_ls: list children
     @return: the 4 parameters

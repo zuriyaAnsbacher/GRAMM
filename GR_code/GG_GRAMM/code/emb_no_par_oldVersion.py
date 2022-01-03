@@ -1,8 +1,10 @@
-from GR_code.GG_GRAMM.code.aux_functions import sep_child_chro, d_per_type, exist_homoz_d, exist_homoz_l, \
+from GR_code.GG_GRAMM.code.aux_functions_oldVersion import sep_child_chro, d_per_type, exist_homoz_d, exist_homoz_l, \
     child_from_spec_d, append_to_fm12, fix_indexes
-from GR_code.GG_GRAMM.code.als import Als
-from GR_code.GG_GRAMM.code.utils import child_ls_merge
+from GR_code.GG_GRAMM.code.als_oldVersion import Als
+from GR_code.GG_GRAMM.code.utils_oldVersion import child_ls_merge
 
+
+# old version
 
 def div_2als(gr0, gr1, als, after):
     """
@@ -27,9 +29,9 @@ def div_2als(gr0, gr1, als, after):
 
 def div_4als(spec_d):
     """
-    divide 4 alleles to 2 groups, with keep the logic of inheritance from parents
+    divide 4 alleles_names to 2 groups, with keep the logic of inheritance from parents
     for example : 01+02, 02+03, 03+04 --> [01, 03] [02, 04]
-    @param spec_d: dict with data of children alleles
+    @param spec_d: dict with data of children alleles_names
     @return: 2 groups
     """
     gr0 = Als()
@@ -76,8 +78,8 @@ def emb_4als_in_pars(chF, chM, child_ls, child_d, al_types):
     @param chM: chromosome of mother
     @param child_ls: children list
     @param child_d: children dict
-    @param al_types: all types: A, B, C, DR, DB
-    @return: the division of 4 alleles to parents chromosomes
+    @param al_types: all alleles_names: A, B, C, DR, DB
+    @return: the division of 4 alleles_names to parents chromosomes
     """
     f1, f2, m1, m2 = chF.ch1, chF.ch2, chM.ch1, chM.ch2
     find_4 = False
@@ -91,7 +93,7 @@ def emb_4als_in_pars(chF, chM, child_ls, child_d, al_types):
             spec_d = d_per_type(child_d, types)  # dict without repetitions in specific allele
             cur_ls = child_from_spec_d(spec_d)  # list of keys (children) in spec_d
             if len(cur_ls) == 2:  # 2 children
-                c_00, c_01, c_10, c_11 = sep_child_chro(spec_d, cur_ls)  # the 4 different alleles
+                c_00, c_01, c_10, c_11 = sep_child_chro(spec_d, cur_ls)  # the 4 different alleles_names
                 append_to_fm12(f1, m1, f2, m2, types, c_00, c_01, c_10, c_11)
                 if len(set(lst)) == 4:  # the second emb is probability, so add more option
                     f2[types].append(c_11)
@@ -111,7 +113,7 @@ def emb_4als_in_pars(chF, chM, child_ls, child_d, al_types):
 
 def emb_np(types, als_of_ty, is_deter, f1, f2, m1, m2):
     """
-    embed child to chromosomes from parents that he inherited. case of no data about parents
+    embed _child_ to chromosomes from parents that he inherited. case of no data about parents
     @param types: one type from A/B/C/DR/DB
     @param als_of_ty: dict of allles of specific type
     @param is_deter: False in case of only 2 children, who inherited different chromosomes. True otherwise.
@@ -119,15 +121,15 @@ def emb_np(types, als_of_ty, is_deter, f1, f2, m1, m2):
     @param f2: second chromosome of father
     @param m1: first chromosome of mother
     @param m2: second chromosome of mother
-    @return: list (len 2). first index - which chromosome child inherited from f (1/2), second - from m.
+    @return: list (len 2). first index - which chromosome _child_ inherited from f (1/2), second - from m.
     """
     # TODO: what about children without data in this allele?
-    emb_FM = [0, 0]  # emb_FM signs which chromo of parents the child emb. if chF2, chM1: [2,1]
+    emb_FM = [0, 0]  # emb_FM signs which chromo of parents the _child_ emb. if chF2, chM1: [2,1]
     f_als = f1[types] + f2[types]
     m_als = m1[types] + m2[types]
     als_par = f_als + m_als
-    is_ex, homoz = exist_homoz_l(als_par)  # TODO: but in als_par there are 4 alleles, no?
-    if is_ex and homoz in als_of_ty:  # if was embed homozygous and this al exist in child
+    is_ex, homoz = exist_homoz_l(als_par)  # TODO: but in als_par there are 4 alleles_names, no?
+    if is_ex and homoz in als_of_ty:  # if was embed homozygous and this al exist in _child_
         del als_of_ty[als_of_ty.index_a(homoz)]  # remove homoz' and emb the second al
         if als_of_ty[0] in f_als:
             emb_FM = [f_als.index_a(als_of_ty[0]) + 1, m_als.index_a(homoz) + 1]

@@ -1,7 +1,8 @@
 import re
 
-from GR_code.GG_GRAMM.code.utils import convert_to_serology
+from GR_code.GG_GRAMM.code.utils_oldVersion import convert_to_serology
 
+# old version
 
 class simReader:
     """

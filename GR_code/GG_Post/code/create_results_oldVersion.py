@@ -4,9 +4,8 @@ import json
 import itertools
 from os import remove
 
-from GR_code.GG_GRAMM.code.utils import sum_errors, convert_to_serology
-from GR_code.GG_Post.code.readers.sim_reader import simReader
-
+from GR_code.GG_GRAMM.code.utils_oldVersion import sum_errors, convert_to_serology
+from GR_code.GG_Post.code.readers.sim_reader_oldVersion import simReader
 
 
 def is_equal(al_1, al_2):
@@ -15,9 +14,9 @@ def is_equal(al_1, al_2):
     return False
 
 
-# def validate(hap_1, hap_2, member, alleles):
-#     hap_1 = string_list(hap_1, alleles)
-#     hap_2 = string_list(hap_2, alleles)
+# def validate(hap_1, hap_2, member, alleles_names):
+#     hap_1 = string_list(hap_1, alleles_names)
+#     hap_2 = string_list(hap_2, alleles_names)
 #     for j in range(len(hap_1)):
 #         if not (is_equal(member[j][0], hap_1[j]) and is_equal(member[j][1], hap_2[j])) \
 #                 and not (is_equal(member[j][0], hap_2[j]) and is_equal(member[j][1], hap_1[j])):
@@ -32,7 +31,7 @@ def validate(hap_1, hap_2, member, alleles):
     # pairs_consistent = [True] * len(pairs)
     # for k, pair in enumerate(pairs):
     for j in range(len(hap_1)):
-        pairs = list(itertools.combinations(member[j], 2))
+        pairs = list(itertools.combinations(member[j], 2))  # todo: is it for serology case?
         pairs_consistent = [True] * len(pairs)
         for k, pair in enumerate(pairs):
             if not (is_equal(pair[0], hap_1[j]) and is_equal(pair[1], hap_2[j])) \
@@ -149,7 +148,7 @@ def open_serology_options_children(child, types, s_dict):
         group_of_antigen_to_remove = []
 
     # for chromosome in [c1f, c2f, c1m, c2m]:
-    #     for type_ in types:
+    #     for type_ in alleles_names:
     #         for allele in chromosome[type_]:
     #             group = type_ + '*' + allele
     #             # check if the value (group) is in dict (low res only)
@@ -194,12 +193,19 @@ def run_Post_GRIMM(input_file, orig_input, alleles, output_path, er_lst, double_
         fam_dict[s_id[0]] = [family_ids[1:], family_als]
         family_ids, family_als, orig, _ = ddr.get_family()
 
-
     if is_ser:
         gram_path = os.path.abspath("GR_code/GG_GRAMM")  # check that
-        with open(gram_path + '/data/ser_dict_group2antigen.json') as ser_dict_path_group2anti:
+
+        # with open(gram_path + '/data/ser_dict_group2antigen.json') as ser_dict_path_group2anti:
+        #     ser_dict_group2anti = json.load(ser_dict_path_group2anti)
+        # with open(gram_path + '/data/ser_dict_antigen2group.json') as ser_dict_path_anti2group:
+        #     ser_dict_anti2group = json.load(ser_dict_path_anti2group)
+
+        with open(
+                "/home/zuriya/PycharmProjects/GR_Web/GR_code/GG_GRAMM/data/ser_dict_group2antigen.json") as ser_dict_path_group2anti:
             ser_dict_group2anti = json.load(ser_dict_path_group2anti)
-        with open(gram_path + '/data/ser_dict_antigen2group.json') as ser_dict_path_anti2group:
+        with open(
+                "/home/zuriya/PycharmProjects/GR_Web/GR_code/GG_GRAMM/data/ser_dict_antigen2group.json") as ser_dict_path_anti2group:
             ser_dict_anti2group = json.load(ser_dict_path_anti2group)
 
         for key_ser, fam_val in fam_dict.items():
@@ -274,9 +280,9 @@ def run_Post_GRIMM(input_file, orig_input, alleles, output_path, er_lst, double_
 
     wf.close()
 
-    # run_again is a flag that give sign if there is 1 family and it failed because inconsistent.
+    # run_again is a flag that give sign if there is 1 family and it failed_count because inconsistent.
     # in this case, we run again the process, with 1000 results in grimm (instead of 10).
-    # it can lead to results (when the alleles are rare)
+    # it can lead to results (when the alleles_names are rare)
     run_again = True if len(fam_dict) == 1 and len(invalid_list) == 1 else False
     return output_path + '/results.csv', run_again
 

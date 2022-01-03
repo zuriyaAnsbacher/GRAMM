@@ -1,7 +1,7 @@
-from GR_code.GG_GRAMM.code.als import Als
+from GR_code.GG_GRAMM.code.als_oldVersion import Als
 
 
-# old version
+#  old version
 
 class DualChromosome:
     """
