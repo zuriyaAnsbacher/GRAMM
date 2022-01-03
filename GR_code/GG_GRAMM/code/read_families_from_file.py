@@ -2,10 +2,10 @@ import re
 import csv
 import json
 
-from general_aux_funs import convert_to_serology
+from GR_code.GG_GRAMM.code.general_aux_funs import convert_to_serology
 
 
-def get_families(user_file, aux_tools):
+def get_families(user_file, aux_tools, dont_open_ser=False):
     """
     get families data from user file
     :param user_file: user file
@@ -13,15 +13,17 @@ def get_families(user_file, aux_tools):
         'amb' dict, that keep the ambiguity data, if exists.
         'is_serology' flag, to convert the allele to serology interpretation, if the user choose that
         'ser_dict' that contains the serology conversion rules
+    :param dont_open_ser: True when we read the families in "create_results", so we do not want to convert to serology
+    (because we do it into the code, in different way (only children)
     :return: dict with data about the families, in this structure:
         keys: families indexes (1, 2..)
         values: dict for each family
             in these sub-dicts (for each family):
                 keys: indexes of family members: F, M, 1, 2 ...
-                values: alleles data
-                    in these sub-sub dict (of alleles data for each family member):
-                    keys: alleles names (A, B..)
-                    values: list of numbers of each alleles (e.g: [02:01, 30:04])
+                values: alleles_names data
+                    in these sub-sub dict (of alleles_names data for each family member):
+                    keys: alleles_names names (A, B..)
+                    values: list of numbers of each alleles_names (e.g: [02:01, 30:04])
     """
     file = open(user_file, 'r')
     reader = csv.reader(file)
@@ -31,7 +33,7 @@ def get_families(user_file, aux_tools):
     for line in reader:
         id_family = line[0]
         id_person = line[1]
-        indv_alleles, data_exist = get_individual(line, aux_tools, id_family)
+        indv_alleles, data_exist = get_individual(line, aux_tools, id_family, dont_open_ser)
         if data_exist:
             if id_family not in families_dict:
                 families_dict[id_family] = {}  # create a sub dict to the family in families_dict
@@ -42,12 +44,13 @@ def get_families(user_file, aux_tools):
     return families_dict
 
 
-def get_individual(line, aux_tools, id_family):
+def get_individual(line, aux_tools, id_family, dont_open_ser):
     """
     get individual data
     :param line: line in file
     :param aux_tools: explained in "get_families" function
     :param id_family: family index
+    :param dont_open_ser: True when we read the families in "create_results", so we do not want to convert to serology
     :return: individual data, and flag that equal to False if there is no data about this individual
     """
     indv_alleles = {}
@@ -56,7 +59,7 @@ def get_individual(line, aux_tools, id_family):
     alleles_map = {2: 'A', 4: 'B', 6: 'C', 8: 'DRB1', 10: 'DQB1'}
     for i in range(2, 11, 2):
         alleles_pair = line[i:i+2]
-        new_alleles_pair = process_alleles(alleles_pair, alleles_map[i], aux_tools, id_family)
+        new_alleles_pair = process_alleles(alleles_pair, alleles_map[i], aux_tools, id_family, dont_open_ser)
         indv_alleles[alleles_map[i]] = new_alleles_pair
     if not any(item for sublist in indv_alleles.values() for item in sublist):  # completely empty: {('',''),('','')..}
         data_exist = False
@@ -64,18 +67,19 @@ def get_individual(line, aux_tools, id_family):
     return indv_alleles, data_exist
 
 
-def process_alleles(pair, allele, aux_tools, id_family):
+def process_alleles(pair, allele, aux_tools, id_family, dont_open_ser):
     """
-    process alleles: replace irrelevant characters, remove ambiguity (if exists) and save it to a dict,
+    process alleles_names: replace irrelevant characters, remove ambiguity (if exists) and save it to a dict,
     convert to serology if needed
-    :param pair: alleles pair
+    :param pair: alleles_names pair
     :param allele: the specific allele of this pair (A/B..)
     :param aux_tools: explained in "get_families" function
     :param id_family: family index
-    :return: alleles pair, after process
+    :param dont_open_ser: True when we read the families in "create_results", so we do not want to convert to serology
+    :return: alleles_names pair, after process
     """
     # TODO: add try-except and error message or error may not occurs?
-    amb = aux_tools['amb']  # amb is a dict of ambiguity of alleles
+    amb = aux_tools['amb']  # amb is a dict of ambiguity of alleles_names
     is_serology = aux_tools['is_serology']  # is_serology is boolean (serology samples or genetic)
     ser_dict = aux_tools['antigen2group']  # ser_dict is a dict for the conversion to serology interpretation
 
@@ -97,7 +101,7 @@ def process_alleles(pair, allele, aux_tools, id_family):
         """
             Save the ambiguity in dict and remove it from al1, al2.
             That because in the stage of comparing between parents and children, it could disturb.
-            For example: parent: A*02:BJFV, child:A*02:02, we will not recognize it could match.
+            For example: parent: A*02:BJFV, _child_:A*02:02, we will not recognize it could match.
             Before the insertion to GRIMM, we restore it to data.
         """
         # TODO: right now, the saving of the amb in dict doesn't have identification about the person
@@ -113,7 +117,7 @@ def process_alleles(pair, allele, aux_tools, id_family):
         if len(al) == 1 and al.isdigit():  # one digit to two digits (2 -> 02)
             al = '0' + al
 
-        if is_serology:
+        if is_serology and not dont_open_ser:
             al = convert_to_serology(ser_dict, allele, al)
 
         new_als.append(al)
@@ -121,12 +125,12 @@ def process_alleles(pair, allele, aux_tools, id_family):
     return new_als
 
 
-def run_script():
-    aux_tools_dict = {}
-    aux_tools_dict['amb'] = {}
-    aux_tools_dict['is_serology'] = True
-    with open('/home/zuriya/PycharmProjects/GR_Web/GR_code/GG_GRAMM/data/ser_dict_antigen2group.json') as ser_dict_path_anti2group:
-        ser_dict_anti2group = json.load(ser_dict_path_anti2group)
-    aux_tools_dict['ser_dict'] = ser_dict_anti2group
-
-    get_families('/home/zuriya/PycharmProjects/GR_Web/static/example_file1.csv', aux_tools_dict)
+# def run_script():
+#     aux_tools_dict = {}
+#     aux_tools_dict['amb'] = {}
+#     aux_tools_dict['is_serology'] = True
+#     with open('/home/zuriya/PycharmProjects/GR_Web/GR_code/GG_GRAMM/data/ser_dict_antigen2group.json') as ser_dict_path_anti2group:
+#         ser_dict_anti2group = json.load(ser_dict_path_anti2group)
+#     aux_tools_dict['ser_dict'] = ser_dict_anti2group
+#
+#     get_families('/home/zuriya/PycharmProjects/GR_Web/static/example_file1.csv', aux_tools_dict)

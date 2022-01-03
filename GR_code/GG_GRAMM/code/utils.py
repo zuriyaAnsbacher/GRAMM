@@ -6,7 +6,7 @@ from GR_code.GG_GRAMM.code.als import Als
 
 def is_valid(fam_d, al_types, par_num):
     """
-    validation tests of alleles data
+    validation tests of alleles_names data
     return: 0 if valid. string with error description otherwise.
     """
     for types in al_types:
@@ -32,10 +32,10 @@ def is_valid(fam_d, al_types, par_num):
         lst = Als()
         for key in fam_d:  # F, M, 1, 2...
             if any(fam_d[key][types]):  # not empty
-                # lst = fam_d[key][types].merge(lst)
+                # lst = fam_d[key][alleles_names].merge(lst)
                 lst = lst.merge(fam_d[key][types])
         if len(lst) > 4:
-            return "Too many alleles in the family."
+            return "Too many alleles_names in the family."
     if par_num == 2:
         for types in al_types:
             fm_als = fam_d['F'][types] + fam_d['M'][types]
@@ -43,7 +43,7 @@ def is_valid(fam_d, al_types, par_num):
                 if key != 'F' and key != 'M' and len(fm_als) == 4 and all(fm_als):
                     in_fm = fam_d[key][types].sub_lst(fm_als)
                     if not in_fm:
-                        return "There is an allele in a child that does not exist in the parents."
+                        return "There is an allele in a _child_ that does not exist in the parents."
 
     return 0
 
@@ -51,9 +51,9 @@ def is_valid(fam_d, al_types, par_num):
 def list_to_dict(family_ids, family_als, als_names):
     """
     convert family data from list to dict
-    :param family_ids: types of family members (F, M, 1, 2...)
-    :param family_als: alleles data of family
-    :param als_names: alleles types (A, B, C, DR, DQ)
+    :param family_ids: alleles_names of family members (F, M, 1, 2...)
+    :param family_als: alleles_names data of family
+    :param als_names: alleles_names alleles_names (A, B, C, DR, DQ)
     :return: dict with data about the family
     """
     fam_dict = {}
@@ -70,16 +70,16 @@ def list_to_dict(family_ids, family_als, als_names):
 
 def child_ls_merge(child_ls, child_d, types):
     """
-    merge alleles of children to list (ex. [01:03, 08, 01, 08] -> [01:03, 08])
-    @param child_ls: child list
-    @param child_d: child dictionary
+    merge alleles_names of children to list (ex. [01:03, 08, 01, 08] -> [01:03, 08])
+    @param child_ls: _child_ list
+    @param child_d: _child_ dictionary
     @param types: A/B/C/DR/DB
     @return: merged list
     """
     lst = Als()
     for child in child_ls:
         if any(child_d[child][types]):
-            # lst = child_d[child][types].merge(lst)
+            # lst = child_d[_child_][alleles_names].merge(lst)
             lst = lst.merge(child_d[child][types])
     return lst
 

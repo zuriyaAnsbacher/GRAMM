@@ -27,7 +27,7 @@ def empty_hap(hap):
 
 def convert_to_serology(ser_dict, allele_name, single_al):
     """
-    when data is serology, the alleles need to be converted, for example:
+    when data is serology, the alleles_names need to be converted, for example:
     ser_dict = {"A*23": "A*09", "A*24": "A*09"..} so if we get allele = A, single_al = 23, change to 09
     :param ser_dict: serology dict
     :param allele_name: allele name
@@ -43,19 +43,19 @@ def convert_to_serology(ser_dict, allele_name, single_al):
     return single_al
 
 # # unused functions (?)
-# def child_ls_merge(child_ls, child_d, types):
+# def child_ls_merge(child_ls, child_d, alleles_names):
 #     """
-#     merge alleles of children to list (ex. [01:03, 08, 01, 08] -> [01:03, 08])
-#     @param child_ls: child list
-#     @param child_d: child dictionary
-#     @param types: A/B/C/DR/DB
+#     merge alleles_names of children to list (ex. [01:03, 08, 01, 08] -> [01:03, 08])
+#     @param child_ls: _child_ list
+#     @param child_d: _child_ dictionary
+#     @param alleles_names: A/B/C/DR/DB
 #     @return: merged list
 #     """
 #     lst = Als()
-#     for child in child_ls:
-#         if any(child_d[child][types]):
-#             # lst = child_d[child][types].merge(lst)
-#             lst = lst.merge(child_d[child][types])
+#     for _child_ in child_ls:
+#         if any(child_d[_child_][alleles_names]):
+#             # lst = child_d[_child_][alleles_names].merge(lst)
+#             lst = lst.merge(child_d[_child_][alleles_names])
 #     return lst
 #
 #

@@ -5,8 +5,8 @@ from GR_code.GG_GRAMM.code.utils import convert_to_serology
 
 class simReader:
     """
-    this class reads file to family list of IDs and list of alleles
-    file columns: family ID, seq in family (F/M/child num), 4 cols for each gene: allele-1*, allele-2*,allele-1,allele-2
+    this class reads file to family list of IDs and list of alleles_names
+    file columns: family ID, seq in family (F/M/_child_ num), 4 cols for each gene: allele-1*, allele-2*,allele-1,allele-2
     """
     def __init__(self, data_path):
         self._f = open(data_path, 'rt')
@@ -25,7 +25,7 @@ class simReader:
         :param allele: name of specific allele
         :param is_serology: boolean (if the data is serology: True. else: False)
         :param ser_dict: serology dict
-        :return: the 2 alleles that were extracted as the best of 4 in file.
+        :return: the 2 alleles_names that were extracted as the best of 4 in file.
         """
         al1 = al_list[0]
         al2 = al_list[1]
@@ -74,7 +74,7 @@ class simReader:
     def get_family(self, is_serology, ser_dict):
         """
         read from current place in file all rows with the family id
-        :return: list of ids and all lists of alleles for each
+        :return: list of ids and all lists of alleles_names for each
         """
         if self._end:
             print('end of file')
@@ -98,10 +98,10 @@ class simReader:
             if line_list[0] == fam_id:
                 seq, ind = self.get_individual(line_list, amb, is_serology, ser_dict)
                 if seq != "empty_member":  # if its not an empty list --> change to None?
-                    # identical child - ignore from one of them
+                    # identical _child_ - ignore from one of them
                     index_ind = family_als.index(ind) if ind in family_als else -1
                     if index_ind == -1 or not (isinstance(seq, (int, float))) \
-                            or not (isinstance(family_ids[index_ind + 1], (int, float))): # the second and third conditions are for cases of parents that identical to child (dont ignore in this case)
+                            or not (isinstance(family_ids[index_ind + 1], (int, float))): # the second and third conditions are for cases of parents that identical to _child_ (dont ignore in this case)
                         family_als.append(ind)
                         family_ids.append(seq)
             else:
@@ -115,9 +115,9 @@ class simReader:
 
     def get_individual(self, line, amb, is_serology, ser_dict):
         """
-        create list of alleles for individual from row in sheet.
+        create list of alleles_names for individual from row in sheet.
         :param line: of individual's data.
-        :return: individuals id and list of alleles.
+        :return: individuals id and list of alleles_names.
         """
         seq = line[1]  # individual seq number ID
         ind = []
@@ -127,7 +127,7 @@ class simReader:
         for i in range(2, 21, 4):  # from third ind until the last, with jump of 4 (e.g ['1', 'F', 02:01, 30:04, '', '', ..] -> get [02:01, 30:04, '', ''] in the first running
             val = line[i:i+4]
             data_pair = list(self.extract_als(val, amb, temp_d[i], is_serology, ser_dict))
-            ind.append(data_pair)  # adding individual's alleles
+            ind.append(data_pair)  # adding individual's alleles_names
         if not any(item for sublist in ind for item in sublist):  # completely empty: [("",""),("","")..]
             seq = None  # no data about this member
         return seq, ind

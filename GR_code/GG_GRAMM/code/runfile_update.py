@@ -10,7 +10,7 @@ from GR_code.GG_GRAMM.code.adding_children_data import add_child_data
 from GR_code.GG_GRAMM.code.haplotypes_to_Glstrign import create_gl_and_write_to_file
 
 
-def run_GRAMM(input_path, out_files_path, alleles_names, races_dict, is_serology):
+def run_GRAMM(input_path, out_files_path, alleles_names, races_dict, open_ambiguity_sim, is_serology):
     out_GLstr, out_binary = get_files_path(out_files_path)
     low2high, antigen2group, group2antigen = load_jsons()
 
@@ -32,8 +32,8 @@ def run_GRAMM(input_path, out_files_path, alleles_names, races_dict, is_serology
         par_num = check_num_parents(family)
         aux_tools['problematic_child'] = None  # initialize for the new family
 
-        # convert the data structure of each pair alleles from list to Als
-        # 'Als' is a class which inherited from 'list', with adjusted attributes for alleles
+        # convert the data structure of each pair alleles_names from list to Als
+        # 'Als' is a class which inherited from 'list', with adjusted attributes for alleles_names
         convert_data_to_Als(family)
 
         remove_duplicate_children(family, alleles_names)
@@ -41,7 +41,7 @@ def run_GRAMM(input_path, out_files_path, alleles_names, races_dict, is_serology
         valid_family = is_valid_family(family, alleles_names, par_num, idx_fam, aux_tools, errors_in_families)  # TODO: add checking format? (mistake in writing). or case that person has one value in an allele?
         if not valid_family:
             continue  # we do not want to analyze this family, so continue to the next family
-        # TODO: in post-grimm, need to add this child to result file and visualization file
+        # TODO: in post-grimm, need to add this _child_ to result file and visualization file
 
         # create dual haplotype for father and mother (without data, yet)
         hapF, hapM = DualHaplotype(alleles_names), DualHaplotype(alleles_names)
@@ -76,9 +76,9 @@ def run_GRAMM(input_path, out_files_path, alleles_names, races_dict, is_serology
             if not success_associate:  # partial associating: with one or less parent
                 planB.append(child)
 
-            # after we know which haplotypes the child inherited, we try to add data to them,
-            # based on the parents and the child data in these haplotypes
-            success_adding = add_child_data(hapF, hapM, family[child], child, associating, alleles_names, aux_tools,
+            # after we know which haplotypes the _child_ inherited, we try to add data to them,
+            # based on the parents and the _child_ data in these haplotypes
+            success_adding = add_child_data(hapF, hapM, family[child], child, len(children_keys), associating, alleles_names, aux_tools,
                                             idx_fam, errors_in_families)
             if not success_adding:
                 error_in_adding_so_continue_to_next_family = True
@@ -87,7 +87,7 @@ def run_GRAMM(input_path, out_files_path, alleles_names, races_dict, is_serology
             continue
 
         for child in planB:  # explained above (in definition of 'planB') # TODO: check it
-            success_adding = do_planB(hapF, hapM, family[child], child, alleles_names, aux_tools, idx_fam,
+            success_adding = do_planB(hapF, hapM, family[child], child, len(children_keys), alleles_names, aux_tools, idx_fam,
                                       errors_in_families)
             if not success_adding:
                 error_in_adding_so_continue_to_next_family = True
@@ -97,8 +97,8 @@ def run_GRAMM(input_path, out_files_path, alleles_names, races_dict, is_serology
         # ---- go over children, associate with the haplotypes they inherited and add data to parents haplotypes ----/
 
         # ---------- convert the data in the parents haplotypes to gl string and write to a file ----------
-        success_gl_string = create_gl_and_write_to_file(hapF, hapM, alleles_names, idx_fam, aux_tools, out_GLstr,
-                                                        races_dict, errors_in_families)
+        create_gl_and_write_to_file(hapF, hapM, alleles_names, idx_fam, par_num, aux_tools, out_GLstr,
+                                                        races_dict, open_ambiguity_sim, errors_in_families)
         # ---------- convert the data in the parents haplotypes to gl string and write to a file ----------/
 
         if aux_tools['problematic_child']:  # todo: remove
@@ -109,7 +109,7 @@ def run_GRAMM(input_path, out_files_path, alleles_names, races_dict, is_serology
 
     print(errors_in_families)  # todo: remove
 
-    return errors_in_families, aux_tools['parent_has_empty_hap']
+    return errors_in_families, aux_tools
 
 
 

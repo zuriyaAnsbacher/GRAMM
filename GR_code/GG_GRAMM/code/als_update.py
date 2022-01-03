@@ -3,13 +3,13 @@ from GR_code.GG_GRAMM.code.aux_functions import equal_al
 
 class Als(list):
     """
-    This class illustrates a list of alleles.
-    It's a different class because the alleles are required difference treatment:
-    Two alleles considered as equal if they are not contradictory
+    This class illustrates a list of alleles_names.
+    It's a different class because the alleles_names are required difference treatment:
+    Two alleles_names considered as equal if they are not contradictory
     For example, 02 and 02:01 are equal. 03:01 and 03:02 are not.
     It causes to different implementations of some of the functions
     For example:
-        "contain": checking if allele exists in alleles list (e.g. 02:01 exists in [03, 02])
+        "contain": checking if allele exists in alleles_names list (e.g. 02:01 exists in [03, 02])
         "sublist": checking if one list is a sublist of another
         and more
     In additional, there are more methods we want to add.
@@ -115,7 +115,10 @@ class Als(list):
         :param value: value to remove
         """
         if self.index_a(value) != -1:
-            self.remove(value)
+            self.remove(self[self.index_a(value)])
+            # the complexity of the remove action is because of cases that the allele we want to remove and the
+            # allele that exists in 'self' are equal in the meaning of alleles (like '02' and '02:01'), but not in the
+            # regular meaning
 
     def merge(self, other):
         """
@@ -168,3 +171,4 @@ class Als(list):
                 intersection_count += 1
                 idx_intersection_in_other = other.index_a(allele)  # if 2 intersections, idx will be the second
         return intersection_count, idx_intersection_in_other
+

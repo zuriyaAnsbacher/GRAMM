@@ -5,25 +5,25 @@ def is_valid_family(family, alleles_names, par_num, count_fam, aux_tools, errors
     """
     call to 'data_validation()' that check the family validation.
     if the family is valid - return True
-    else: check if there are only one problematic child.
-        if it's only one child: remove him and continue the analyzing. (return True)
+    else: check if there are only one problematic _child_.
+        if it's only one _child_: remove him and continue the analyzing. (return True)
         but if the problem is with a parent or some children - reject the family (return False)
     :param family: family dict
-    :param alleles_names: alleles names
+    :param alleles_names: alleles_names names
     :param par_num: num of parents
     :param count_fam: family index
-    :param aux_tools: dict that we can sign if there is a problematic child
+    :param aux_tools: dict that we can sign if there is a problematic _child_
     :param errors_in_families: dict that includes the details about errors
     :return: True if valid, otherwise - False
     """
     is_valid, error_code, invalid_member = data_validation(family, alleles_names, par_num)
     if not is_valid:
-        # if the error relates to a parent, or more than one child, reject the family
+        # if the error relates to a parent, or more than one _child_, reject the family
         if invalid_member == 'All':
             errors_in_families[count_fam] = ['All', error_code]
             return False
-        # if there is only one problematic child, we mark him and remove temporarily from family.
-        # (in the output to user, we will sign this child as problematic)
+        # if there is only one problematic _child_, we mark him and remove temporarily from family.
+        # (in the output to user, we will sign this _child_ as problematic)
         else:
             errors_in_families[count_fam] = [invalid_member, error_code]
             del family[invalid_member]  # it is removed also from families_dict (because of 'del' attribute)  # TODO: check it!
@@ -36,7 +36,7 @@ def data_validation(fam_d, alleles_names, par_num):
     check validation of the user data.
     there are some kinds of errors, signed with errors codes. the meaning of them is in "errors_codes_meaning.json"
     :param fam_d: family dict
-    :param alleles_names: alleles names list: [A, B, C, DRB1, DQB1]
+    :param alleles_names: alleles_names names list: [A, B, C, DRB1, DQB1]
     :param par_num: number of parents
     :return: 3 outputs:
         first:
@@ -45,7 +45,7 @@ def data_validation(fam_d, alleles_names, par_num):
             the error code ('None' if valid)
         third:
             the family member that cause to the error. ('None' if valid)
-            if there is only one problematic child, we want to analyze
+            if there is only one problematic _child_, we want to analyze
             the family without him.
             in any other case (errors in parents, or errors that relate for some members), we reject the family,
             and return 'All' as a flag
@@ -68,10 +68,10 @@ def data_validation(fam_d, alleles_names, par_num):
 
     invalid_members = [case[1] for case in invalid_cases]  # get the invalid family members (e.g: ['F', '2'])
 
-    # in case that there is an error only in one child,
+    # in case that there is an error only in one _child_,
     # we want to sign and remove him, and analyze the family without him
     if set(invalid_members) == 1 and invalid_members[0] not in ['F', 'M', 'All']:
-        # return that it's invalid, the error code, and the child index
+        # return that it's invalid, the error code, and the _child_ index
         return False, invalid_cases[0][0], invalid_members[0]
     # in any other case, we want to reject the family.
     # if there are some reasons for the rejection, we return the first
@@ -109,7 +109,7 @@ def check_missing_data(fam_d, par_num, invalid_cases):
 
 def check_too_much_alleles(fam_d, alleles_names, invalid_cases):
     """
-    check if there are too much alleles in the family (more that 4 in an allele)
+    check if there are too much alleles_names in the family (more than 4 in an allele)
     """
     for al_name in alleles_names:
         lst = Als()
@@ -118,12 +118,12 @@ def check_too_much_alleles(fam_d, alleles_names, invalid_cases):
                 # lst = fam_d[fam_member][al_name].merge(lst)
                 lst = lst.merge(fam_d[fam_member][al_name])
         if len(lst) > 4:
-            invalid_cases.append(('4', 'All'))  # Too many alleles
+            invalid_cases.append(('4', 'All'))  # Too many alleles_names
 
 
 def check_allele_in_child_that_does_not_exist_in_parents(fam_d, alleles_names, par_num, invalid_cases):
     """
-    check if there is an allele in a child that does not exist in the parents
+    check if there is an allele in a _child_ that does not exist in the parents
     """
     for al_name in alleles_names:
         fm_als = fam_d['F'][al_name] + fam_d['M'][al_name]
@@ -131,7 +131,7 @@ def check_allele_in_child_that_does_not_exist_in_parents(fam_d, alleles_names, p
             if fam_member != 'F' and fam_member != 'M' and len(fm_als) == 4 and all(fm_als):
                 in_fm = fam_d[fam_member][al_name].sub_lst(fm_als)
                 if not in_fm:
-                    invalid_cases.append(('5', fam_member))  # allele in a child that does not exist in the parents
+                    invalid_cases.append(('5', fam_member))  # allele in a _child_ that does not exist in the parents
 
 
 def check_if_there_is_allele_with_4_diff_values(fam_d, alleles_names, invalid_cases):
@@ -151,7 +151,7 @@ def check_if_there_is_allele_with_4_diff_values(fam_d, alleles_names, invalid_ca
         for child in fam_d:  # no parents, according the condition in the call to this function
             child_alleles = fam_d[child][al_name]
             if any(child_alleles):  # merge only if there is data in 'child_alleles'
-                # merge the values of the current alleles child to the values of the other children in this allele
+                # merge the values of the current alleles_names _child_ to the values of the other children in this allele
                 # e.g. : alleles_values: [02, 03]. child_alleles: [02:01, 04]. so the merging: [02, 03, 04]
                 # note: the merging may save the low-res values (02 instead of 02:01),
                 # but it's not matter, because just need the values amount
@@ -161,5 +161,5 @@ def check_if_there_is_allele_with_4_diff_values(fam_d, alleles_names, invalid_ca
             four_different_values = True
 
     if not four_different_values:
-        invalid_cases.append(('6', 'All'))  # no parents, and no alleles with 4 diff values (algorithm can not executed)
+        invalid_cases.append(('6', 'All'))  # no parents, and no alleles_names with 4 diff values (algorithm can not executed)
 
