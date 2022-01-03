@@ -1,6 +1,8 @@
 from GR_code.GG_GRAMM.code.als import Als
 
 
+# old version
+
 class DualChromosome:
     """
     this class represent 2 chromosome of father or mother
