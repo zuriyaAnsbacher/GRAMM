@@ -1,4 +1,4 @@
-from GR_code.GG_GRAMM.code.aux_functions import equal_al
+from GR_code.GG_GRAMM.code.general_aux_funs import equal_als
 
 
 class Als(list):
@@ -26,7 +26,7 @@ class Als(list):
         """
         if value == "":  # empty value considers as contained in each Als list
             return True
-        lst1 = [equal_al(ele, value) for ele in self]  # check equality with every item in Als
+        lst1 = [equal_als(ele, value) for ele in self]  # check equality with every item in Als
         return True if any(lst1) else False  # return True if equal to one at least
 
     def __eq__(self, other):
@@ -104,7 +104,7 @@ class Als(list):
         :return: the value index if exist. otherwise, -1
         """
         for i in range(len(self)):
-            if equal_al(self[i], value):
+            if equal_als(self[i], value):
                 return i
         return -1
 
