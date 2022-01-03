@@ -4,7 +4,7 @@ from GR_code.GG_GRAMM.code.als import Als
 class DualChromosome:
     """
     this class represent 2 chromosome of father or mother
-    each chromosome is a dictionary, which contains data of alleles
+    each chromosome is a dictionary, which contains data of alleles_names
     """
     def __init__(self, al_types):
         self.ch1 = {}
@@ -15,7 +15,7 @@ class DualChromosome:
 
     def emb_data(self, fam_d, cur_par, par_num):
         """
-        embed alleles data in the chromosomes of parents
+        embed alleles_names data in the chromosomes of parents
         one- permanent, other- two options (if there is homozygous allele- it permanent, too)
         :param fam_d: dict with allele data
         """
