@@ -1,9 +1,9 @@
 import os
 from shutil import move
-from GR_code.GG_GRAMM.code.runfile import run_GRAMM
+from GR_code.GG_GRAMM.code.runfile_oldVersion import run_GRAMM
 from GR_code.GG_GRIMM.validation.runfile import run_GRIMM
-from GR_code.GG_Post.code.create_results import run_Post_GRIMM
-from GR_code.GG_Post.code.visualization import visualize
+from GR_code.GG_Post.code.create_results_oldVersion import run_Post_GRIMM
+from GR_code.GG_Post.code.visualization_oldVersion import visualize
 
 
 def run_all(input2GRAMM, alleles, files_address, res_1000, is_serology, race_dict):
@@ -22,7 +22,5 @@ def run_all(input2GRAMM, alleles, files_address, res_1000, is_serology, race_dic
     visualize(results, double_als, files_address)
 
     return results, errors, run_again
-
-# path_res, path_er_pre = run_all("/home/dsi/zuriya/Projects/GR_Web/GR_code/GG_GRAMM/input/EASY.csv", ['A', 'B', 'C', 'DRB1', 'DQB1'], "/home/dsi/zuriya/Projects/GR_Web/output_train")
 
 

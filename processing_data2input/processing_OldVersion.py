@@ -18,7 +18,7 @@ def add2file(files_folder, id_person, A1_data, B1_data, C1_data, DRB11_data, DQB
 
     with open(os.path.join(files_folder, temp_f), 'a+') as f2:
         writer2 = csv.writer(f2)
-        # pay attention the child must be 1, 2,...
+        # pay attention the _child_ must be 1, 2,...
         row = ["1", id_person, A1_data, A2_data, B1_data, B2_data, C1_data, C2_data, DRB11_data, DRB12_data, DQB11_data, DQB12_data]
         writer2.writerow(row)
 
