@@ -82,7 +82,7 @@ def convert_gl_file_to_columns_file(reader, writer, match_als2col, headers, race
                 race_dict.clear()
 
 
-def save_ambiguity_to_dict(pair_als, open_ambiguity, id_fam):  # A*03:01/A*03:02/A*03:08...
+def save_ambiguity_to_dict(pair_als, open_ambiguity, id_fam, id_person):  # A*03:01/A*03:02/A*03:08...
     """
     in some simulations files, the genotype is given with ambiguity, e.g: A*03:01/A*03:02/A*03:08...
     we remove all the ambiguities options (because in GRAMM we cant handle them), save them, and in the end of
@@ -90,24 +90,51 @@ def save_ambiguity_to_dict(pair_als, open_ambiguity, id_fam):  # A*03:01/A*03:02
     :param pair_als: pairs of allelles
     :param open_ambiguity: the dict that keep all the options of the ambiguity
     :param id_fam: family index
+    :param id_person: person index (F, M, 1, 2..)
     """
+    if id_person not in ['F', 'M']:
+        id_person = 'children'
+
     if id_fam not in open_ambiguity:
-        open_ambiguity[id_fam] = {'A': {}, 'B': {}, 'C': {}, 'DRB1': {}, 'DQB1': {}}
+        open_ambiguity[id_fam] = {}
+    if id_person not in open_ambiguity[id_fam]:
+        open_ambiguity[id_fam][id_person] = {'A': {}, 'B': {}, 'C': {}, 'DRB1': {}, 'DQB1': {}}
 
     # assumes the pair_als is 'A*03:01/A*03:02... + A*01:01/A*01:02...'
     for allele in pair_als.split('+'):  # A*03:01/A*03:02 ... , A*01:01/A*01:02...
         if allele == '' or 'UUUU' in allele:
             continue
         allele_name = allele.split('*')[0]  # A
-        two_first_digits = allele.split(':')[0].split('*')[1]  # 03
+        first2_digits = allele.split(':')[0].split('*')[1]  # 03
         ambiguities = [single.split(':')[1].rstrip() for single in allele.split('/')] # A*03:01/A*03:02/A*03:08 -> [01, 02, 08..]
 
-        if two_first_digits in open_ambiguity[id_fam][allele_name]:
-            open_ambiguity[id_fam][allele_name][two_first_digits].extend(ambiguities)
+        if first2_digits in open_ambiguity[id_fam][id_person][allele_name]:
+            open_ambiguity[id_fam][id_person][allele_name][first2_digits].extend(ambiguities)
         else:
-            open_ambiguity[id_fam][allele_name][two_first_digits] = ambiguities
+            open_ambiguity[id_fam][id_person][allele_name][first2_digits] = ambiguities
 
-        open_ambiguity[id_fam][allele_name][two_first_digits] = list(set(open_ambiguity[id_fam][allele_name][two_first_digits]))
+        # remove duplicates, while keep the order
+        open_ambiguity[id_fam][id_person][allele_name][first2_digits] = \
+            list(dict.fromkeys(open_ambiguity[id_fam][id_person][allele_name][first2_digits]))
+
+    # if id_fam not in open_ambiguity:
+    #     open_ambiguity[id_fam] = {'A': {}, 'B': {}, 'C': {}, 'DRB1': {}, 'DQB1': {}}
+    #
+    # # assumes the pair_als is 'A*03:01/A*03:02... + A*01:01/A*01:02...'
+    # for allele in pair_als.split('+'):  # A*03:01/A*03:02 ... , A*01:01/A*01:02...
+    #     if allele == '' or 'UUUU' in allele:
+    #         continue
+    #     allele_name = allele.split('*')[0]  # A
+    #     two_first_digits = allele.split(':')[0].split('*')[1]  # 03
+    #     ambiguities = [single.split(':')[1].rstrip() for single in allele.split('/')] # A*03:01/A*03:02/A*03:08 -> [01, 02, 08..]
+    #
+    #     if two_first_digits in open_ambiguity[id_fam][allele_name]:
+    #         open_ambiguity[id_fam][allele_name][two_first_digits].extend(ambiguities)
+    #     else:
+    #         open_ambiguity[id_fam][allele_name][two_first_digits] = ambiguities
+    #
+    #     # remove duplicates, while keep the order
+    #     open_ambiguity[id_fam][allele_name][two_first_digits] = list(dict.fromkeys(open_ambiguity[id_fam][allele_name][two_first_digits]))
 
 
 def convert_PED_file_to_columns_file(reader, writer, match_als2col, race_dict):
@@ -125,11 +152,14 @@ def convert_PED_file_to_columns_file(reader, writer, match_als2col, race_dict):
 
     for line in reader:
         output_line = [''] * 12
-        output_line[0] = line[0].lstrip('0')  # id family
-        output_line[1] = line[1]  # id person
+        id_fam = line[0].lstrip('0')
+        id_person = line[1]
 
         if line[2] == 'NULL':  # NULL exist in parents rows only
-            output_line[1] = 'F' if line[4] == '1' else 'M'
+            id_person = 'F' if line[4] == '1' else 'M'
+
+        output_line[0] = id_fam
+        output_line[1] = id_person
 
         all_als = line[5].split("^")
         for pair_als in all_als:
@@ -139,7 +169,8 @@ def convert_PED_file_to_columns_file(reader, writer, match_als2col, race_dict):
                            pair_als.split('|')[0].split("+")[1].split(":")[0]
             elif "/" in line[5]:  # ambiguity (in children): A*03:01/A*03:02/A*03:08 ...
                 open_ambiguity['is_amb'] = True
-                save_ambiguity_to_dict(pair_als, open_ambiguity, id_fam=output_line[0])  # todo: add idx_fam
+                # if id_person in ['F', 'M']:  # save amb only for parents
+                save_ambiguity_to_dict(pair_als, open_ambiguity, id_fam=id_fam, id_person=id_person)
                 al1, al2 = pair_als.split("+")[0].split("/")[0].split(":")[0], \
                            pair_als.split("+")[1].split("/")[0].split(":")[0]
             else:  # no ambiguity: A*03:02+A*01:01 (or A*03+A*01)
@@ -197,12 +228,15 @@ def convert_DD_or_Israel_file(reader, writer, match_als2col):
     open_ambiguity = {'is_amb': True}
     for line in reader:
         output_line = [''] * 12
-        output_line[0] = line[0].lstrip('0')  # id family
-        output_line[1] = line[1]  # id person
+        id_fam = line[0].lstrip('0')
+        id_person = line[1]
+        output_line[0] = id_fam
+        output_line[1] = id_person
 
         for i in range(2, 12, 2):
             pair_als = line[i] + '+' + line[i + 1]
-            save_ambiguity_to_dict(pair_als, open_ambiguity, id_fam=output_line[0])
+            # if id_person in ['F', 'M']:
+            save_ambiguity_to_dict(pair_als, open_ambiguity, id_fam=id_fam, id_person=id_person)
 
             al1, al2 = pair_als.split("+")[0].split("/")[0].split(":")[0], \
                        pair_als.split("+")[1].split("/")[0].split(":")[0]
