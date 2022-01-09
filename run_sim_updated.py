@@ -384,7 +384,7 @@ def get_sim_file_with_persons_passed_successfully_gramm_running(orig_sim, out_fr
 
 
 def main():
-    cur_sim = "HARD"
+    cur_sim = "HARDESTRECOMB0"
     version = 'new_simulations'
     skip_headers = True
 
@@ -399,7 +399,7 @@ def main():
     RUN_GRAMM = True
     RUN_GRIMM = True
 
-    is_genotype = False
+    is_genotype = True
 
     if not os.path.exists(f'running_for_GRAMM_paper/results_and_errors_simulations_gramm/{version}'):
         os.mkdir(f'running_for_GRAMM_paper/results_and_errors_simulations_gramm/{version}')
@@ -545,30 +545,61 @@ def main():
 
             # save output from gramm (for calculate pi^2, freqs..)
             move('GR_code/GG_GRIMM/validation/output/don.hap.freqs',
-                 f'running_for_GRAMM_paper/output_from_grimm_after_update/{version}/{cur_sim}.txt')
+                 f'running_for_GRAMM_paper/output_from_grimm_after_update/{version}/{cur_sim}.csv')
 
         # print results in the end of running                                                                         s
-        if RUN_GRAMM:
-            print('GRAMM:\nHaplotypes:\nFirst result:')
-            print(right_and_error_gramm_hap)
-            print('Exists result')
-            print(right_and_error_gramm_exist_hap)
+        # if RUN_GRAMM:
+        #     print('GRAMM:\nHaplotypes:\nFirst result:')
+        #     print(right_and_error_gramm_hap)
+        #     print('Exists result')
+        #     print(right_and_error_gramm_exist_hap)
+        #
+        #     print('Genotypes:\nFirst result:')
+        #     print(right_and_error_gramm_geno)
+        #     print('Exists result')
+        #     print(right_and_error_gramm_exist_geno)
+        #
+        # if RUN_GRIMM:
+        #     print('GRIMM:\nHaplotypes:\nFirst result:')
+        #     print(right_and_error_grimm_hap)
+        #     print('Exists result')
+        #     print(right_and_error_grimm_exist_hap)
+        #
+        #     print('Genotypes:\nFirst result:')
+        #     print(right_and_error_grimm_geno)
+        #     print('Exists result')
+        #     print(right_and_error_grimm_exist_geno)
 
-            print('Genotypes:\nFirst result:')
-            print(right_and_error_gramm_geno)
-            print('Exists result')
-            print(right_and_error_gramm_exist_geno)
+        print('Haplotypes:\nFirst result:')
+        print('GRAMM: ', right_and_error_gramm_hap, ' %success: ',
+              right_and_error_gramm_hap['right'] / (
+                      right_and_error_gramm_hap['right'] + right_and_error_gramm_hap['error']) * 100)
+        print('GRIMM: ', right_and_error_grimm_hap, ' %success: ',
+              right_and_error_grimm_hap['right'] / (
+                          right_and_error_grimm_hap['right'] + right_and_error_grimm_hap['error']) * 100)
+        print('\nExist result:')
+        print('GRAMM: ', right_and_error_gramm_exist_hap, ' %success: ',
+              right_and_error_gramm_exist_hap['right'] / (
+                      right_and_error_gramm_exist_hap['right'] + right_and_error_gramm_exist_hap['error']) * 100)
+        print('GRIMM: ', right_and_error_grimm_exist_hap, ' %success: ',
+              right_and_error_grimm_exist_hap['right'] / (
+                      right_and_error_grimm_exist_hap['right'] + right_and_error_grimm_exist_hap['error']) * 100)
 
-        if RUN_GRIMM:
-            print('GRIMM:\nHaplotypes:\nFirst result:')
-            print(right_and_error_grimm_hap)
-            print('Exists result')
-            print(right_and_error_grimm_exist_hap)
+        print('\nGenotypes:\nFirst result:')
+        print('GRAMM: ', right_and_error_gramm_geno, ' %success: ',
+              right_and_error_gramm_geno['right'] / (
+                      right_and_error_gramm_geno['right'] + right_and_error_gramm_geno['error']) * 100)
+        print('GRIMM: ', right_and_error_grimm_geno, ' %success: ',
+              right_and_error_grimm_geno['right'] / (
+                      right_and_error_grimm_geno['right'] + right_and_error_grimm_geno['error']) * 100)
+        print('\nExist result:')
+        print('GRAMM: ', right_and_error_gramm_exist_geno, ' %success: ',
+              right_and_error_gramm_exist_geno['right'] / (
+                      right_and_error_gramm_exist_geno['right'] + right_and_error_gramm_exist_geno['error']) * 100)
+        print('GRIMM: ', right_and_error_grimm_exist_geno, ' %success: ',
+              right_and_error_grimm_exist_geno['right'] / (
+                      right_and_error_grimm_exist_geno['right'] + right_and_error_grimm_exist_geno['error']) * 100)
 
-            print('Genotypes:\nFirst result:')
-            print(right_and_error_grimm_geno)
-            print('Exists result')
-            print(right_and_error_grimm_exist_geno)
 
 
     if Israel:
@@ -608,37 +639,21 @@ def main():
              f'running_for_GRAMM_paper/cordmom/results_and_errors/errors_cord_mom.txt')
 
 
-def main1():  # run grimm for save the haplotypes anf freqs it return, for calculate pi^2
-    cur_sim = 'HARDEST'
-    version = 'version_after_update_grimm'
+def main1():
+    cur_sim = 'LESSEASY'
+    version = 'new_simulations'
     skip_headers = True
 
-    get_sim_file_with_persons_passed_successfully_gramm_running(
-        f'running_for_GRAMM_paper/simulations/PEDIGREE_HAPLO_MASTER_{cur_sim}.csv',
+    right_and_error_gramm_hap = check_if_first_pred_equal_to_sim_GRAMM(
+        f'running_for_GRAMM_paper/simulations updated/PEDIGREE_HAPLO_MASTER_CAU_{cur_sim}.csv',
         f'running_for_GRAMM_paper/results_and_errors_simulations_gramm/{version}/results_{cur_sim}.csv',
-        f'running_for_GRAMM_paper/input_for_grimm_running/{version}/{cur_sim}.csv', skip_headers)
+        skip_headers, genotype=True)
 
-    move(f'running_for_GRAMM_paper/input_for_grimm_running/{version}/{cur_sim}.csv',
-         'GR_code/GG_GRIMM/validation/simulation/data/input_test.txt')
-    if os.path.exists(
-            "GR_code/GG_GRIMM/validation/simulation/data/bin_input_test.txt"):  # in grimm we dont use bin file
-        os.remove("GR_code/GG_GRIMM/validation/simulation/data/bin_input_test.txt")
-
-    run_GRIMM(res_1000=False, sim=False)
-
-    right_and_error_grimm = check_if_first_pred_equal_to_sim_GRIMM(
-        f'running_for_GRAMM_paper/simulations/PEDIGREE_HAPLO_MASTER_{cur_sim}.csv',
-        'GR_code/GG_GRIMM/validation/output/don.hap.freqs',
-        skip_headers)
-
-    right_and_error_grimm_exist = check_if_exist_pred_equal_to_sim_GRIMM(
-        f'running_for_GRAMM_paper/simulations/PEDIGREE_HAPLO_MASTER_{cur_sim}.csv',
-        'GR_code/GG_GRIMM/validation/output/don.hap.freqs', skip_headers)
-
-    print(right_and_error_grimm)
-    print(right_and_error_grimm_exist)
-
-    move('GR_code/GG_GRIMM/validation/output/don.hap.freqs', f'running_for_GRAMM_paper/output_from_grimm_after_update/{cur_sim}.txt')
+    right_and_error_grimm_hap = check_if_first_pred_equal_to_sim_GRIMM(
+        f'running_for_GRAMM_paper/simulations updated/PEDIGREE_HAPLO_MASTER_CAU_{cur_sim}.csv',
+        f'running_for_GRAMM_paper/output_from_grimm_after_update/{version}/{cur_sim}.csv',
+        skip_headers, genotype=True)
+    a = 1
 
 
 main()
