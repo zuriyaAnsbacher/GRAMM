@@ -200,7 +200,7 @@ def single2high(allele, alleles_name, idx_fam, idx_par, open_ambiguity_sim, aux_
             if idx_par in open_ambiguity_sim[idx_fam] and allele in open_ambiguity_sim[idx_fam][idx_par][alleles_name]:
                 options = open_ambiguity_sim[idx_fam][idx_par][alleles_name][allele]
             # parent wasn't in simulation file but there is data from children genotypes (or exists, but no data in this allele (options=[]))
-            elif idx_par not in open_ambiguity_sim[idx_fam] and allele in open_ambiguity_sim[idx_fam]['children'][alleles_name] or not options:
+            elif (idx_par not in open_ambiguity_sim[idx_fam] or not options) and allele in open_ambiguity_sim[idx_fam]['children'][alleles_name]:
                 options = open_ambiguity_sim[idx_fam]['children'][alleles_name][allele]
 
         if not open_ambiguity_sim or not options:  # not a simulation or a simulation without options to this allele
