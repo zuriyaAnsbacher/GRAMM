@@ -172,3 +172,16 @@ class Als(list):
                 idx_intersection_in_other = other.index_a(allele)  # if 2 intersections, idx will be the second
         return intersection_count, idx_intersection_in_other
 
+    def count_a(self, value):
+        """
+        count how many times value appears in self
+        :param value: value
+        :return: counts times
+        """
+        count = 0
+        for element in self:
+            if equal_als(value, element):
+                count += 1
+        return count
+
+
