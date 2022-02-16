@@ -44,7 +44,7 @@ def run_Post_GRIMM(input_from_grimm, orig_input, alleles_names, output_path, aux
 
         for key_fam, family_dict in families_dict.items():
             for idx_member, member in family_dict.items():
-                if idx_member not in ['F', 'M']:  # open to serology only children data # todo: why?
+                # if idx_member not in ['F', 'M']:  # open to serology only children data # todo: why?
                     for allele_name, alleles_values in member.items():
                         for idx_allele, single_allele in enumerate(alleles_values):
                             # we first convert to group name and then open all the options to the group name
@@ -114,7 +114,7 @@ def run_Post_GRIMM(input_from_grimm, orig_input, alleles_names, output_path, aux
     # in this case, we run again the process, with 1000 results in grimm (instead of 10).
     # it can lead to results (when the alleles are rare)
     run_again = True if len(families_dict) == 1 and len(invalid_list) == 1 else False
-    return output_path + '/results.csv', run_again  # todo: maybe not return path to 'results'?
+    return output_path + '/results.csv', run_again
 
 
 def open_res_file(output_path):
@@ -194,6 +194,13 @@ def common_allele(als_list1, als_list2):
     return False
 
 
+def sort_hap(hap):  # organize in this order: A,B,C,DRB1,DQB1
+    hap = hap.split('~')
+    hap[-1], hap[-2] = hap[-2], hap[-1]
+    hap = '~'.join(hap)
+    return hap
+
+
 def valid_family(key, family, p_1, p_2, alleles_names, aux_tools, errors_in_families, writer):
     """
     check if a given combination of parents haplotypes is consistent with all children
@@ -207,7 +214,7 @@ def valid_family(key, family, p_1, p_2, alleles_names, aux_tools, errors_in_fami
     :param writer: writer to results file
     :return: True if consistency, False otherwise
     """
-    hap_1, hap_2, hap_3, hap_4 = p_1[0], p_1[1], p_2[0], p_2[1]
+    hap_1, hap_2, hap_3, hap_4 = sort_hap(p_1[0]), sort_hap(p_1[1]), sort_hap(p_2[0]), sort_hap(p_2[1])
     freq_1, freq_2 = float(p_1[2]), float(p_2[2])
     valid, not_valid = [], []
     is_serology = aux_tools['is_serology']
@@ -230,7 +237,8 @@ def valid_family(key, family, p_1, p_2, alleles_names, aux_tools, errors_in_fami
             else:
                 not_valid.append(idx_member)
 
-    if len(not_valid) == 0:
+    # second condition for allow one problematic child. (but only if there are at least 2 children)
+    if len(not_valid) == 0 or (len(not_valid) == 1 and not_valid[0] not in ['F', 'M'] and any(['~' in v in valid for v in valid])):
         match_child2haps = [member for member in valid if '~' in member]  # example: [1=F2~M2, 2=F1~M2 ...]
 
         if key in errors_in_families and errors_in_families[key][0] != 'All':
@@ -287,8 +295,10 @@ def validate(hap_1, hap_2, member, is_serology):  # todo: check it !!
 
             # the first two conditions are for [] and ["", ""]
             if not val_member or not any(val_member) or val_hap1 in val_member and val_hap2 in val_member:
-                pairs_consistent[idx_allele] = True
-                continue
+                # avoid cases like '01' in val_member once, and val_hap1='01:01', val_hap2='01:02' (so it's invalid, but previous condition is true)
+                if not (val_member.index_a(val_hap1) == val_member.index_a(val_hap2) and val_member.count_a(val_hap1) == 1):
+                    pairs_consistent[idx_allele] = True
+                    continue
 
         if all(pairs_consistent):
             return True
@@ -343,7 +353,7 @@ def errors_summary_and_writing_to_file(output_path, errors_in_families, families
                 out_file.write(''.join(['Child "', str(problematic_member), '" in family "', str(idx_fam), '": ',
                                         error_massage, '\n']))
 
-        out_file.write('\n-------------------- Errors Summary (Only rejected *families*) --------------------\n')
+        out_file.write('\n-------------------- Errors Summary (Only rejected families) --------------------\n')
         all_errors_codes = [value[1] for value in errors_in_families.values() if value[0] == 'All']
         for key_error, error_value in errors_meaning.items():
             sum_error = all_errors_codes.count(key_error)

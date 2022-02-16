@@ -82,7 +82,7 @@ def visualize(resultsFile, parent_has_empty_hap, output_path):
 
             dict_colors = {'F1': colors_f[0], 'F2': colors_f[1], 'M1': colors_m[0], 'M2': colors_m[1]}
             for child_num in range(childs_num):
-                cur_child = fam_solutions[SOL_INDEX][CHILDS_INDEX].split(':')[child_num].lstrip('"')
+                cur_child = fam_solutions[SOL_INDEX][CHILDS_INDEX].split(';')[child_num].lstrip('"')
                 for hap in range(2):
                     child_hap_fm = cur_child.split("=")[1].split("~")[hap].rstrip()
                     try:
