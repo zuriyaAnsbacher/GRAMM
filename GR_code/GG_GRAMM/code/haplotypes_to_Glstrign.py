@@ -1,5 +1,6 @@
 import copy
 import itertools
+import pyard
 from GR_code.GG_GRAMM.code.general_aux_funs import empty_hap
 from GR_code.GG_GRAMM.code.als_update import Als
 
@@ -169,7 +170,7 @@ def options_to_gl(options, allele_start):
     return gl
 
 
-def single2high(allele, alleles_name, idx_fam, idx_par, open_ambiguity_sim, aux_tools):  # todo: need more work on this function !
+def single2high(allele, alleles_name, idx_fam, idx_par, open_ambiguity_sim, aux_tools, ard):  # todo: need more work on this function !
     """
     convert allele value to high res, if needed
     :param allele: allele value
@@ -192,7 +193,7 @@ def single2high(allele, alleles_name, idx_fam, idx_par, open_ambiguity_sim, aux_
         new_allele = ''.join([alleles_name, '*', allele])
     #  -------------------------- high res --------------------------/
 
-    # ---- allele in low res, e.g. 02. check options in open_ambiguity_sim or low2high_dict (dict with the options)----
+    # ---- allele in low res, e.g. 02. check options in open_ambiguity_sim or pyard or low2high_dict ----
     elif ':' not in allele:
         # one of the simulations, that we removed all the open ambiguities (03:01/03:02.. ->03)
         if open_ambiguity_sim:
@@ -200,31 +201,41 @@ def single2high(allele, alleles_name, idx_fam, idx_par, open_ambiguity_sim, aux_
             if idx_par in open_ambiguity_sim[idx_fam] and allele in open_ambiguity_sim[idx_fam][idx_par][alleles_name]:
                 options = open_ambiguity_sim[idx_fam][idx_par][alleles_name][allele]
             # parent wasn't in simulation file but there is data from children genotypes (or exists, but no data in this allele (options=[]))
-            elif (idx_par not in open_ambiguity_sim[idx_fam] or not options) and allele in open_ambiguity_sim[idx_fam]['children'][alleles_name]:
+            elif (idx_par not in open_ambiguity_sim[idx_fam] or not options) and allele in \
+                    open_ambiguity_sim[idx_fam]['children'][alleles_name]:
                 options = open_ambiguity_sim[idx_fam]['children'][alleles_name][allele]
 
         if not open_ambiguity_sim or not options:  # not a simulation or a simulation without options to this allele
-            key = ''.join([alleles_name, '*', allele])
-            if key in low2high_dict:
-                options = low2high_dict[key]
-            else:  # if not in the dict, the allele stays with low res
-                new_allele = key  # TODO: or success = False?
+            try:  # py-ard
+                tmp_allele_name = copy.copy(alleles_name)[:2] if alleles_name in ['DRB1', 'DQB1'] else alleles_name
+                key_serology = ''.join([tmp_allele_name, copy.copy(allele).lstrip('0')])
+                new_allele = ard.redux_gl(key_serology, 'lgx')
+            except:  # low2high
+                key = ''.join([alleles_name, '*', allele])
+                if key in low2high_dict:
+                    options = low2high_dict[key]
+                else:  # if not in the dict, the allele stays with low res
+                    new_allele = key  # TODO: or success = False?
     # -------------------------- low res --------------------------/
 
     # ---------- ambiguity, e.g: 02:APC (in the code its 02:, because we removed the letters) ----------
     elif allele.endswith(':'):
         # 'amb_dict' contains the ambiguity of alleles_names in current family that removed before.
         # e.g: in data: A*02:APC , after remove: 02: , in 'amb_dict' (to family 1, for example): {'1': {'A*02': APC}}
-        key = ''.join([alleles_name, '*', allele.rstrip(':')])
+        key = ''.join([alleles_name, '*', copy.copy(allele).rstrip(':')])
         ambiguity = amb_dict[idx_fam][key]
-        try:
-            if isinstance(low2high_dict[ambiguity], list):
-                options = low2high_dict[ambiguity]
-            else:  # it's a dict.
-                # we take only keys() because it enough for high res (the values() with give us the third digits pair)
-                options = list(low2high_dict[ambiguity].keys())
-        except KeyError:
-            # if ambiguity not in low2high_dict, we open all the options by the low res
+
+        try:  # py-ard
+            pyard_key = ''.join([key, ':', ambiguity])
+            new_allele = ard.redux_gl(pyard_key, 'lgx')
+            # if new_allele == '':  # pyard failed. try low2high?
+            #     if isinstance(low2high_dict[ambiguity], list):
+            #         options = low2high_dict[ambiguity]
+            #     else:  # it's a dict.
+            #         # we take only keys() because it enough for high res (the values() with give us the third digits pair)
+            #         options = list(low2high_dict[ambiguity].keys())
+        except:
+            # if ambiguity not in low2high_dict (/pyard?), we open all the options by the low res
             # (e.g: we have A*02:APC but APC not in low2high_dict, so we look for all options of 02--> 02:01/03....)
             if key in low2high_dict:
                 options = low2high_dict[key]
@@ -242,14 +253,11 @@ def single2high(allele, alleles_name, idx_fam, idx_par, open_ambiguity_sim, aux_
         return success, new_allele
     else:
         allele_start = ''.join([alleles_name, '*', allele])
-        try:
-            new_allele = options_to_gl(options, allele_start)
-        except:
-            print('_')
+        new_allele = options_to_gl(options, allele_start)
         return success, new_allele
 
 
-def create_gl_string(h1, h2, alleles_names, idx_fam, idx_par, par_num, open_ambiguity_sim, aux_tools):
+def create_gl_string(h1, h2, alleles_names, idx_fam, idx_par, par_num, open_ambiguity_sim, aux_tools, ard):
     """
     from 2 haplotypes (of a parent) we create all the possible gl strings
     :param h1: first haplotype
@@ -299,8 +307,8 @@ def create_gl_string(h1, h2, alleles_names, idx_fam, idx_par, par_num, open_ambi
         for i, pair in enumerate(option):
             al1, al2 = pair.split('+')
             success1, al1 = single2high(al1, _alleles_names_[i], idx_fam, idx_par, open_ambiguity_sim,
-                                        aux_tools)  # TODO: check the _alleles_names_[i]
-            success2, al2 = single2high(al2, _alleles_names_[i], idx_fam, idx_par, open_ambiguity_sim, aux_tools)
+                                        aux_tools, ard)  # TODO: check the _alleles_names_[i]
+            success2, al2 = single2high(al2, _alleles_names_[i], idx_fam, idx_par, open_ambiguity_sim, aux_tools, ard)
             if not success1 or not success2:
                 success_gl_string = False
                 break
@@ -383,6 +391,7 @@ def create_gl_and_write_to_file(hapF, hapM, alleles_names, idx_fam, par_num, aux
     """
     # success_gl_string = True
     binaries_to_GRIMM = []
+    ard = pyard.ARD()
 
     duplicate_hap_if_one_empty(hapF, hapM, aux_tools, idx_fam)
 
@@ -391,12 +400,12 @@ def create_gl_and_write_to_file(hapF, hapM, alleles_names, idx_fam, par_num, aux
         # create binary list for each parent. the purpose is explained in th function 'create_binary_to_GRIMM'
         binaries_to_GRIMM.append(create_binary_to_GRIMM(h1, h2, alleles_names, par_num))
 
-    if aux_tools['is_serology']:
-        convert_from_serology(hapF, hapM, alleles_names, aux_tools['group2antigen'])
+    # if aux_tools['is_serology']:
+    #     convert_from_serology(hapF, hapM, alleles_names, aux_tools['group2antigen'])
 
     for idx_par, (h1, h2) in enumerate([(hapF.hap1, hapF.hap2), (hapM.hap1, hapM.hap2)]):
         success, gl_string_options = create_gl_string(h1, h2, alleles_names, idx_fam, idx_par, par_num,
-                                                      open_ambiguity_sim, aux_tools)
+                                                      open_ambiguity_sim, aux_tools, ard)
         if success:
             write_gl_to_file(out_GLstr, gl_string_options, idx_fam, idx_par, races_dict)
             load_binaries_to_dict(idx_par, idx_fam, binaries_to_GRIMM[idx_par], aux_tools['binary_dict'])
