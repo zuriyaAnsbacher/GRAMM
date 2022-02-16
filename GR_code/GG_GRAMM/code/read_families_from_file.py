@@ -31,6 +31,8 @@ def get_families(user_file, aux_tools, dont_open_ser=False):
     families_dict = {}
 
     for line in reader:
+        if not line:  # empty line
+            continue
         id_family = line[0]
         id_person = line[1]
         indv_alleles, data_exist = get_individual(line, aux_tools, id_family, dont_open_ser)
