@@ -8,8 +8,8 @@ from flask import Flask, request, flash, redirect, send_from_directory
 from flask import render_template
 from werkzeug.utils import secure_filename
 
-from processing_data2input.processing import add2file, basic_csv2format, split_gl, create_glstring, \
-    add_races_from_file_to_dict, add_races_from_manual_insertion
+from processing_data2input.processing_update import add2file, basic_csv2format, split_gl, create_glstring, \
+    add_races_from_manual_insertion
 from run3parts import run_all
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -34,7 +34,7 @@ def remove_old_files():
     files1.extend(files2)
     print(files1)
     for filename in files1:
-        # if file exist more than hour, remove it (.zip and .png)
+        # if file exist more than hour, remove it (.zip, .png, .pdf)
         if (filename.endswith('zip') or filename.endswith('png') or filename.endswith('pdf')) and (now - os.stat(filename).st_mtime) > 3600:
             try:
                 if os.path.exists(filename):
@@ -43,8 +43,8 @@ def remove_old_files():
                 print("Unable to remove file: %s" % filename)
 
 
-# every 5 hours, remove old files of users (.zip and .png)
-# can not remove them in regular way, cause they were sent to user
+# every 5 hours, remove old files of users (.zip, .png, .pdf)
+# can not remove them in regular way, because they were sent to user
 sched = BackgroundScheduler(daemon=True)
 sched.add_job(remove_old_files, 'interval', minutes=3000)
 sched.start()
@@ -80,11 +80,12 @@ def home():
     if request.method == 'POST':
         try:
             if request.form["submit_btn"] == "Results":
-                select_f, select_m = False, False
+                select_f, select_m = False, False  # release the blockage for choosing a parent that already chose
                 gl_accepted = ''
                 races_manually_temp = races_manually  # put the data in another variable and clear (use the tmp after)
                 races_manually = ''
                 is_serology = True if request.form["gentic_or_serology"] == 'Serology' else False
+
                 if submit_file:  # the user submit a file
                     # check if the post request has the file part
                     if len(request.files) == 0:
@@ -98,8 +99,7 @@ def home():
                         return render_template('home.html', error_message=error_message,
                                                select_f=select_f, select_m=select_m, send2user=False,
                                                gl_accepted=gl_accepted,  races_manually=races_manually)
-                        # flash('No selected file')
-                        # return redirect(request.url)
+
                     if f:
                         # before receive new file, remove all the files
                         # in order that won't be error from data that stay in system
@@ -108,47 +108,44 @@ def home():
 
                         filename = secure_filename(f.filename)
                         path2f_old = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                        f.save(path2f_old)
+                        f.save(path2f_old)  # todo: why save path2f_old and not path2f?
                         path2f = os.path.join(app.config['UPLOAD_FOLDER'], "final.csv")
                         # check if user inserted races, and add to race dict
-                        add_races_from_file_to_dict(path2f_old, race_dict)
-                        basic_csv2format(path2f_old, path2f)
+                        # add_races_from_file_to_dict(path2f_old, race_dict)  # remove because new version
+                        open_ambiguity = basic_csv2format(path2f_old, path2f, race_dict)
                         os.remove(path2f_old)
+
                 if not submit_file:  # the user submit data manually, so create a file
+                    submit_file = True  # change the value to the next insertion
                     # check if user inserted races, and add to race dict
                     add_races_from_manual_insertion(races_manually_temp, race_dict)
                     # convert file to a valid format
                     # maybe not need here, if I create from the start as valid format?
-                    basic_csv2format(app.config['UPLOAD_FOLDER'] + "/data2file.csv", app.config['UPLOAD_FOLDER'] + "/final_file.csv")
+                    open_ambiguity = basic_csv2format(app.config['UPLOAD_FOLDER'] + "/data2file.csv", app.config['UPLOAD_FOLDER'] + "/final.csv", race_dict)
                     # os.remove(app.config['UPLOAD_FOLDER'] + "/data2file.csv")
-                    path2f = app.config['UPLOAD_FOLDER'] + "/final_file.csv"
+                    path2f = app.config['UPLOAD_FOLDER'] + "/final.csv"
                     child_count = 1
-                    submit_file = True  # change the value to the next insertion
                     save_gl_file = True  # flag for saving the file "data2file.csv", and add to zip for user
 
-
-                # res_1000 is a flag for grimm to run with 1000 results (can be true only if run_again is true)
-                res_1000 = False
-
-                TIME = time.time()
+                # res_100 is a flag for grimm to run with 1000 results (can be true only if run_again is true)
+                res_100 = False
 
                 # run the code
                 res_path, errors_path, run_again = run_all(path2f, ['A', 'B', 'C', 'DRB1', 'DQB1'],
-                                                           app.config['UPLOAD_FOLDER'], res_1000, is_serology, race_dict)
+                                                           app.config['UPLOAD_FOLDER'], res_100, is_serology,
+                                                           race_dict, open_ambiguity)
                 if run_again:
-                    res_1000 = True
+                    res_100 = True
                     res_path, errors_path, run_again = run_all(path2f, ['A', 'B', 'C', 'DRB1', 'DQB1'],
-                                                               app.config['UPLOAD_FOLDER'], res_1000, is_serology, race_dict)
+                                                               app.config['UPLOAD_FOLDER'], res_100, is_serology,
+                                                               race_dict, open_ambiguity)
                 race_dict.clear()  # need?
-                print("**************** time *****************")
-                print(f'{float(time.time() - TIME)} second')
 
                 # create random number for differ files of each user
                 # in order for files not to be overwritten in case of parallel use by different users
                 rand_user = str(randint(1, 101))
 
                 # create zip for all the user files
-
                 with ZipFile(''.join([app.config['UPLOAD_FOLDER'], "/output_to_user" + rand_user + ".zip"]),
                              "w") as zipObj:
                     zipObj.write(res_path, basename(res_path))
@@ -185,6 +182,8 @@ def home():
                     os.remove(app.config['UPLOAD_FOLDER'] + "/data2file.csv")
                 if os.path.isfile(app.config['UPLOAD_FOLDER'] + "/user data in gl format.csv"):
                     os.remove(app.config['UPLOAD_FOLDER'] + "/user data in gl format.csv")
+                if os.path.isfile(app.config['UPLOAD_FOLDER'] + "/final.csv"):  # todo: remove the file 'final.csv'?
+                    os.remove(app.config['UPLOAD_FOLDER'] + "/final.csv")
                 for filename in os.listdir(app.config['UPLOAD_FOLDER']):
                     if filename.endswith(".png") or filename.endswith(".pdf"):
                         os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -204,11 +203,11 @@ def home():
                     select_m = True
                 if request.form["gl_or_split"] == "gl":  # gl string
                     gl_str = request.form["gl_string"]
-                    gl_accepted = ''.join([gl_accepted, famcode, ':', gl_str, ' ; '])
+                    gl_accepted = ''.join([gl_accepted, famcode, ':', gl_str, ';\n'])
                     A1_data, B1_data, C1_data, DRB1_data, DQB1_data, A2_data, B2_data, C2_data, DRB2_data, DQB2_data = \
                         split_gl(gl_str)
                 else:  # split insertion
-                    A1_data = request.form["A1"]
+                    A1_data = request.form["A1"]  # todo: create a function for these requests
                     B1_data = request.form["B1"]
                     C1_data = request.form["C1"]
                     DRB1_data = request.form["DRB1"]
@@ -226,27 +225,26 @@ def home():
                 if famcode == "Child":
                     famcode = child_count
                     child_count += 1
+
                 add2file(app.config['UPLOAD_FOLDER'], famcode, A1_data, B1_data, C1_data, DRB1_data,
                          DQB1_data, A2_data, B2_data, C2_data, DRB2_data, DQB2_data, temp_f='data2file.csv')
             if request.form["submit_btn"] == "Clear family":  # clear the data about family
                 if os.path.isfile(app.config['UPLOAD_FOLDER'] + "/data2file.csv"):
                     os.remove(app.config['UPLOAD_FOLDER'] + "/data2file.csv")
-                if os.path.isfile(app.config['UPLOAD_FOLDER'] + "/final_file.csv"):
-                    os.remove(app.config['UPLOAD_FOLDER'] + "/final_file.csv")
+                if os.path.isfile(app.config['UPLOAD_FOLDER'] + "/final.csv"):
+                    os.remove(app.config['UPLOAD_FOLDER'] + "/final.csv")
                 child_count = 1
                 gl_accepted, races_manually, select_f, select_m = '', '', False, False
                 return render_template('home.html', error_message=error_message, select_f=select_f,
                                        select_m=select_m, send2user=False, gl_accepted=gl_accepted,
                                        races_manually=races_manually)
 
-            # if request.form.get("submit_btn") is not None:
             if request.form["submit_btn"] == "add_race":  # add race
                 cur_race = request.form["races"]
                 races_manually = cur_race if races_manually == '' else races_manually + ';' + cur_race
                 return render_template('home.html', error_message=error_message, select_f=select_f,
                                        select_m=select_m, send2user=False, gl_accepted=gl_accepted,
                                        races_manually=races_manually)
-
         except:
             error_message = True
             save_gl_file = False
@@ -321,5 +319,5 @@ def add_header(r):
 
 
 if __name__ == "__main__":
-    # app.run(debug=True)
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True)
+    # app.run(debug=True, host='0.0.0.0')
