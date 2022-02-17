@@ -12,10 +12,7 @@ from GR_code.GG_GRIMM.imputation.imputegl import Imputation
 from GR_code.GG_GRIMM.imputation.imputegl.networkx_graph import Graph
 
 
-def run_GRIMM(res_1000, sim=False):
-    # Profiler start
-    # pr = cProfile.Profile()
-    # pr.enable()
+def run_GRIMM(res_100, sim=False):
 
     parser = argparse.ArgumentParser()
     # if sim:  # simulations file. #todo: maybe unnecessary
@@ -85,8 +82,8 @@ def run_GRIMM(res_1000, sim=False):
 
     }
 
-    if res_1000:  # 1000 results from grimm (only if 10 results failed_count with inconsistent)
-        config["number_of_results"] = 1000
+    if res_100:  # 100 results from grimm (only if 10 results failed_count with inconsistent)
+        config["number_of_results"] = 100
 
     # Display the configurations we are using
     print('****************************************************************************************************')
@@ -126,14 +123,16 @@ def run_GRIMM(res_1000, sim=False):
 
     config["full_loci"] = ''.join(sorted(all_loci_set))
 
+    """ 
+    at the first time you run the code, need to run the part of creating graph. 
+    then, can save it to pickle and in the next time to load the pickle (to save time) 
     """
     # Perform imputation
     graph = Graph(config)
     graph.build_graph(config["node_file"], config["top_links_file"], config["edges_file"])
-    pickle.dump(graph, open('../graph.pkl', 'wb'))
-    """
+    # pickle.dump(graph, open('../graph.pkl', 'wb'))
 
-    graph = pickle.load(open(project_dir + 'graph.pkl', 'rb'))
+    # graph = pickle.load(open(project_dir + 'graph.pkl', 'rb'))
     imputation = Imputation(graph, config)
 
     # Create output directory if it doesn't exist
@@ -142,7 +141,4 @@ def run_GRIMM(res_1000, sim=False):
     # Write out the results from imputation
     imputation.impute_file(config)
 
-    # Profiler end
-    # pr.disable()
-    # pr.print_stats(sort="time")
 
