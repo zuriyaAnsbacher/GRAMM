@@ -1,0 +1,45 @@
+== Graph Imputation Notes
+
+Neo4j guide containing notes about graph-based imputation.
+
+The guide subdirectory contains AsciiDoc source files for a Neo4j guide.
+To use the guide, see below for information about rendering the guide as HTML,
+starting a HTTP server, and playing the guide in a Neo4j browser.
+
+For additional examples of Neo4j guides, see also
+https://github.com/neo4j-contrib/sandbox-guides.
+
+=== Dependencies
+
+The following tools are needed.
+
+1. Ruby programming language:  https://www.ruby-lang.org/
+2. Asciidoctor, e.g. "gem install asciidoctor" after installing Ruby
+3. neo4j-guides, e.g. "git clone https://github.com/neo4j-contrib/neo4j-guides"
+
+Asciidoctor may also require tilt, e.g. "gem install tilt".
+
+=== Render Guide as HTML
+
+Execute render.sh script, after setting GUIDES environment variable to indicate
+location of neo4j-guides.
+[source,bash]
+----
+GUIDES=${HOME}/git/neo4j-guides ./render.sh
+----
+
+=== Start HTTP Server
+
+Execute httpd.sh script, after setting GUIDES environment variable to indicate
+location of neo4j-guides.
+[source,bash]
+----
+GUIDES=${HOME}/git/neo4j-guides ./httpd.sh
+----
+
+=== View Guide in Neo4j Browser
+
+1. Render guide as HTML (see above).
+2. Start HTTP server (see above).
+3. Open Neo4j browser.  E.g. navigate to http://localhost:7474/.
+4. In Neo4j browser, execute command ":play http://localhost:8001/".

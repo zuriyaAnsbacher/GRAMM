@@ -1,0 +1,5 @@
+== Imputation "Plan A"
+
+(a.k.a. happy path)
+
+WARNING:  Under Construction.

@@ -1,0 +1,65 @@
+= Notes
+:URL-PATH: http://localhost:8001
+
+== Graph Imputation Notes
+
+. pass:a[<a play-topic='{URL-PATH}/imputation-plan-a.html'>Imputation "Plan A" (a.k.a. happy path)</a>]
+. pass:a[<a play-topic='{URL-PATH}/imputation-plan-b.html'>Imputation "Plan B" (a.k.a. bailout, unhappy path, sad path)</a>]
+. pass:a[<a play-topic='{URL-PATH}/imputation-plan-b-redux.html'>Imputation "Plan B" Redux</a>]
+
+=== Additional Info
+
+link:{URL-PATH}/images/graph-based-imputation-notes.pdf[graph-based-imputation-notes.pdf]
+
+=== Source for This Neo4j Guide
+
+link:http://svn.nmdp.org/repos/dev/bioinformatics/projects/Neo4j/trunk/imputation/neo4j-guide/[]
+
+=== Cypher Query Example
+
+.Clickable Text Box
+[source,cypher]
+----
+match (abr:ABR {name:"A*02:01~B*51:01~DRB1*13:01"})-[t:TOP]-(abcqr:ABCQR)
+return  abr, t, abcqr
+order by abcqr.frequency[0] desc
+limit 10
+----
+
+== More Cypher Query Examples
+
+Query examples for the WMDA validation haplotype graph ...
+
+.Neighborhood of A*02, Spanning A, AB, ABC, ABCR, and ABCQR
+[source,cypher]
+----
+match (a:A {name:"A*02:01"})-[c1]-(ab:AB)-[c2]-(abc:ABC)-[c3]-(abcr:ABCR)-[c4]-(abcqr:ABCQR)
+where c1.CP[0]>0.05 and c2.CP[0]>0.05 and c3.CP[0]>0.05 and c4.CP[0]>0.05 and abcqr.frequency[0]>0.001
+return  a, ab, c1, c2, c3, c4, abc, abcr, abcqr
+----
+
+.Neighborhoods of ABR Haplotypes Containing A*02
+[source,cypher]
+----
+match (abr:ABR)-[c1]-(abcr:ABCR)-[c2]-(abcqr:ABCQR)
+where abr.name =~ 'A\\*02.*'
+return  c1, c2, abr, abcr, abcqr
+----
+
+.Neighborhood of a Specific ABR Haplotype
+[source,cypher]
+----
+match (abr:ABR {name:"A*02:01~B*07:02~DRB1*15:01"})-[c1]-(abcr:ABCR)-[c2]-(abcqr:ABCQR)
+where c1.CP[0]>0.05 and c2.CP[0]>0.05 and abcqr.frequency[0]>0.001
+return  c1, c2, abr, abcr, abcqr
+----
+
+.Top 10 ABCQR Haplotypes for A*01
+[source,cypher]
+----
+match (abr:ABR)-[t:TOP]-(abcqr:ABCQR)
+where abr.name =~ 'A\\*01.*'
+return  abcqr
+order by abcqr.frequency[0] desc
+limit 10
+----

@@ -1,0 +1,25 @@
+{
+  "populations": [
+    "AAFA"
+  ],
+  "priority": {
+    "alpha": 0,
+    "eta": 0,
+    "beta": 0,
+    "gamma": 0,
+    "deltaFunc": true
+  },
+  "freq_trim_threshold": 1e-5,
+  "freq_data_dir": "imputation/graph_generation/data/NEMO2011/",
+  "node_csv_file": "imputation/graph_generation/output/csv/nodes.csv",
+  "edges_csv_file": "imputation/graph_generation/output/csv/edges.csv",
+  "info_node_csv_file": "imputation/graph_generation/output/csv/info_node.csv",
+  "top_links_csv_file": "imputation/graph_generation/output/csv/top_links.csv",
+  "imputation_in_file": "validation/simulation/data/donor.in.gl",
+  "imputation_out_umug_freq_filename": "don.umug.freqs",
+  "imputation_out_umug_pops_filename": "don.umug.pops",
+  "imputation_out_hap_freq_filename": "don.hap.freqs",
+  "imputation_out_hap_pops_filename": "don.hap.pops",
+  "imputation_out_miss_filename": "don.miss",
+  "imputation_out_problem_filename": "don.problem"
+}

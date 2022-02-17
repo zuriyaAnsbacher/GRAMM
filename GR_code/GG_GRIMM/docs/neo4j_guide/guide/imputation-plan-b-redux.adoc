@@ -1,0 +1,171 @@
+== Imputation "Plan B" Redux
+
+*The situation:*  "Plan A" imputation was attempted, but failed.
+
+=== Two Questions and Four Scenarios
+
+*Q1:*  Were any TOP haplotypes found during the "Plan A" imputation attempt? +
+(I.e. does the graph contain any full-length haplotypes which are consistent
+with the input HLA?)
+
+*Q2:*  Does the input HLA cover all haplotype loci? +
+(I.e. is the input a full-length HLA typing?)
+
+.Scenarios determined by answers to Q1 and Q2
+[width="40%"]
+|===
+|           | *Q2: Yes*  | *Q2: No*
+| *Q1: Yes* | Scenario A | Scenario C
+| *Q1: No*  | Scenario B | Scenario D
+|===
+
+=== Additional Topics
+
+* Details on handling of each scenario
+* Estimating the frequency of a synthetic full-length haplotype
+* Finding the "best" set of marginal components for a full-length haplotype
+* Generating a synthetic (single-locus) genotype list for a missing locus
+
+== Scenario A
+
+* Some TOP haplotypes are consistent with the input HLA.
+* The input HLA covers all haplotype loci.
+
+=== Processing Steps
+
+. Generate a set of complementary (synthetic, full-length) haplotypes,
+computed from the TOP haplotypes and input HLA.
+. Construct genotypes (haplotype pairs) to explain input HLA, using the
+TOP and complementary haplotypes.
+
+== Scenario B
+
+* No TOP haplotypes are consistent with the input HLA.
+* The input HLA covers all haplotype loci.
+
+=== Processing Method
+
+. Generate an initial set of (synthetic full-length) haplotypes, computed
+from "best" set of marginal components for input HLA.
+. Construct synthetic genotypes (haplotype pairs) to explain input HLA.
+.. (only do this if needed ??)  Generate a set of complementary (synthetic,
+full-length) haplotypes, computed from the initial haplotypes and input HLA.
+.. Construct genotypes (haplotype pairs) consistent with the input HLA,
+using the combined set of initial and complementary haplotypes.
+
+== Scenario C
+
+* Some TOP haplotypes are consistent with the input HLA.
+* The input HLA does not cover all haplotype loci.
+
+=== Processing Method
+
+. Construct a synthetic (single-locus) genotype list for each locus missing
+from the input HLA.  When constructing these, consider the missing-locus
+alleles found in the TOP haplotypes.
+. Generate a set of complementary (synthetic, full-length) haplotypes,
+computed from the TOP haplotypes, input HLA, and missing-locus genotype
+lists.
+. Construct genotypes (haplotype pairs) to explain input HLA, using the
+TOP and complementary haplotypes.
+
+== Scenario D
+
+* No TOP haplotypes are consistent with the input HLA.
+* The input HLA does not cover all haplotype loci.
+
+=== Processing Method
+
+. Construct a synthetic (single-locus) genotype list for each locus missing
+from the input HLA.  When constructing these, consider the "best" set
+of marginal components consistent with the input HLA.
+. Generate an initial set of (synthetic full-length) haplotypes, computed
+from "best" set of marginal components consistent with the input HLA and
+missing-locus genotypes.
+. Construct synthetic genotypes (haplotype pairs) to explain input HLA.
+.. (only do this if needed ??)  Generate a set of complementary (synthetic,
+full-length) haplotypes, computed from the initial haplotypes and input HLA.
+.. Construct genotypes (haplotype pairs) consistent with the input HLA,
+using the combined set of initial and complementary haplotypes.
+
+== Estimating the frequency of a synthetic full-length haplotype
+
+Use the "best" set of marginal components to compute estimated frequency
+of each synthetic haplotype.  E.g. start with 4+1 components and work down as
+far as needed.
+
+== Finding the "best" set of marginal components for a full-length haplotype
+
+E.g., first look for 4+1, if that fails look for 3+2, then 3+1+1, 2+2+1,
+2+1+1+1, and finally 1+1+1+1+1.
+
+.Code snippet showing usage of combi and Combinatorics Python modules to generate partitions and combinations
+[source,Python]
+----
+from combi import CombSpace, Comb
+from Combinatorics import m_way_unordered_combinations, partitions2
+
+FULL_LOCI = 'ABCQR'
+NUM_LOCI = len(FULL_LOCI)
+
+# for each partition of FULL_LOCI, compute all marginal component combinations
+for partition in reversed(list(partitions2(NUM_LOCI))):
+    print("\n", list(reversed(partition)), "partition combinations:")
+    for combination in m_way_unordered_combinations(NUM_LOCI,partition):
+        # print('',combination)
+        print(' ', [ Comb.coerce(marginal_component, CombSpace(NUM_LOCI,len(marginal_component))).apply(FULL_LOCI) for marginal_component in combination ])
+
+# example CombSpace usage
+print([ ''.join(combination) for combination in CombSpace(FULL_LOCI,2) if 'B' in combination ])
+----
+
+See also: +
+https://pypi.python.org/pypi/combi/1.1.2 +
+https://combi.readthedocs.io/en/stable/ +
+https://pypi.python.org/pypi/Combinatorics/ +
+http://phillipmfeldman.org/Python/combinatorics.html +
+https://en.wikipedia.org/wiki/Partition_(number_theory)[]
+
+The imputation_plan_b.ipynb notebook contains additional code using those 2 modules. +
+https://github.com/nmdp-bioinformatics/graph-imputation-match/blob/imputation-plan-b/imputation_plan_b/imputation_plan_b.ipynb
+
+== Generating a synthetic (single-locus) genotype list for a missing locus
+
+Try using 2-locus components which overlap the input HLA to generate
+a set of potential alleles for the missing locus.
+
+If the generated set of potential alleles is "sufficient", use it. Otherwise,
+use population-level single-allele frequencies to expand the set.
+
+For example, the Cypher queries shown below retrieve information about 2-locus
+joint distributions from the graph.  Queries such as these could be used to
+generate a set of potential C alleles related to an ABR HLA type (where data
+for locus C is missing).
+
+.AC Joint Distribution
+[source,cypher]
+----
+match (a:A {name:"A*02:01"})-[cp1:CP]-(ac:AC)-[cp2:CP]-(c:C)
+return  distinct ac, c
+order by ac.frequency[0] desc
+limit 10
+----
+
+.BC Joint Distribution
+[source,cypher]
+----
+match (b:B {name:"B*51:01"})-[cp1:CP]-(bc:BC)-[cp2:CP]-(c:C)
+return  distinct bc, c
+order by bc.frequency[0] desc
+limit 10
+----
+
+.CR Joint Distribution
+[source,cypher]
+----
+match (r:R {name:"DRB1*13:01"})-[cp1:CP]-(cr:CR)-[cp2:CP]-(c:C)
+return  distinct cr, c
+order by cr.frequency[0] desc
+limit 10
+----
+

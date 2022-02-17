@@ -1,0 +1,79 @@
+#!/usr/bin/perl
+##############################################################################
+# SCRIPT NAME:	reconcile
+# DESCRIPTION:	
+#
+# DATE WRITTEN: 2018-04-12
+# WRITTEN BY:   Martin Maiers
+#
+##############################################################################
+use strict;    # always
+use warnings;  # or else
+use lib "$ENV{'HOME'}/lib";
+use MUUG;
+
+my $v = 0; # versbose
+
+
+# truth
+my %T;
+my %TP;
+my $truthfile = "output/AAFA_NAMER_DONOR_MASTER.in";
+open FILE, $truthfile or die "$!: $truthfile";
+print STDERR "reading: $truthfile..." if $v;
+while(<FILE>) {
+  chomp;
+  my ($id, $g, $p1, $h1, $p2, $h2) = split /\%/;
+  my $m = MUUG::GLtoMUUG(join '+', $h1, $h2);
+  $m=~s/g//g;
+  $T{$id} = $m;
+  my $pp = join (',', sort ($p1, $p2));
+  $TP{$id} = $pp;
+}
+print STDERR "done\n" if $v;
+
+# imputation
+my %I;
+my %R;
+my $impfile = "output/AAFA_NAMER_GraphVal_PlanA_donor.gl.txt_out";
+$impfile = "head -500000 output/AAFA_NAMER_GraphVal_PlanA_donor.gl.txt_out|";
+print STDERR "reading $impfile..." if $v;
+open FILE, $impfile or die "$!: $impfile";
+while(<FILE>) {
+  chomp;
+  my ($id, $h1, $f1, $p1, $h2, $f2, $p2) = split /,/;
+
+  my $gf = $h1 eq $h2 ? $f1 * $f2 : 2 * $f1 * $f2;
+  my $pp = join (',', sort ($p1, $p2));
+  my $m = MUUG::GLtoMUUG(join '+', $h1, $h2);
+  $R{$id}{$pp}+=$gf;
+  $I{$id}{$pp}{$m}+=$gf;
+}
+print STDERR "done\n" if $v;
+
+# compare
+print STDERR "starting comparison\n" if $v;
+foreach my $id (sort keys %R) {
+  # get max $pp
+  my $maxgf =0;
+  my $maxpp ="";
+  foreach my $pp (keys %{$R{$id}}) {
+    if ($R{$id}{$pp} > $maxgf) {
+      $maxpp = $pp;
+      $maxgf = $R{$id}{$pp};
+    }
+  }
+  print STDERR "id: $id pp: $maxpp gf: $maxgf\n" if $v;
+
+  # the correct mug
+  my $m  = $T{$id}; 
+  my $pp = $TP{$id}; 
+
+  # the likelihood of the correct mug
+  my $likely = ($maxgf && defined $I{$id}{$maxpp}{$m}) ? $I{$id}{$maxpp}{$m}/$maxgf : 0;
+  print join ('	', $id, $pp, $maxpp, sprintf ("%0.12f", $likely)), "\n";
+  
+}
+
+exit 0;
+
