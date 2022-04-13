@@ -110,8 +110,8 @@ def run_GRIMM(res_100, sim=False):
     config["full_loci"] = ''.join(sorted(all_loci_set))
 
     """ 
-    at the first time you run the code, need to run the part of creating graph. 
-    then, can save it to pickle and in the next time to load the pickle (to save time) 
+    At the first time you run the code, need to run the part of creating graph.  
+    Then, can save it to pickle and in the next time to load the pickle (to save time) 
     """
     # Perform imputation
     graph = Graph(config)
@@ -126,5 +126,4 @@ def run_GRIMM(res_100, sim=False):
 
     # Write out the results from imputation
     imputation.impute_file(config)
-
 
