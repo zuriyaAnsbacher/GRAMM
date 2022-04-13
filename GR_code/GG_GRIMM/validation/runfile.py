@@ -15,29 +15,15 @@ from GR_code.GG_GRIMM.imputation.imputegl.networkx_graph import Graph
 def run_GRIMM(res_100, sim=False):
 
     parser = argparse.ArgumentParser()
-    # if sim:  # simulations file. #todo: maybe unnecessary
-    #     parser.add_argument("-c", "--config",
-    #                         required=False,
-    #                         default="../GR_code/GG_GRIMM/conf/haplogic/5loci-don-configuration.json",
-    #                         help="Configuration JSON file",
-    #                         type=str)
-    #     args = parser.parse_args()
-    #     configuration_file = args.config
-    #     project_dir = "../GR_code/GG_GRIMM/"
-    #     output_dir = "../GR_code/GG_GRIMM/validation/output/"
-    # else:
     parser.add_argument("-c", "--config",
                         required=False,
                         default="GR_code/GG_GRIMM/conf/haplogic/5loci-don-configuration.json",
-                        # default="../conf/haplogic/5loci-don-configuration.json", # for run grimm from this script
                         help="Configuration JSON file",
                         type=str)
     args = parser.parse_args()
     configuration_file = args.config
     project_dir = "GR_code/GG_GRIMM/"
     output_dir = "GR_code/GG_GRIMM/validation/output/"
-    # project_dir = "../"  # for run grimm from this script
-    # output_dir = "output/"  # for run grimm from this script
 
     # Read configuration file and load properties
     with open(configuration_file) as f:
