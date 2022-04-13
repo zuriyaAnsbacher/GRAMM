@@ -127,4 +127,3 @@ def run_GRIMM(res_100, sim=False):
     # Write out the results from imputation
     imputation.impute_file(config)
 
-
