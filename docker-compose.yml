@@ -13,5 +13,8 @@ services:
     networks:
       - frontend
 
+    volumes:
+      - ./data:/app/files_from_server
+
 networks:
   frontend:
