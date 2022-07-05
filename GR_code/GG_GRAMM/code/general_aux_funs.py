@@ -1,4 +1,3 @@
-from GR_code.GG_GRAMM.code.als_update import Als
 
 
 def equal_als(al_1, al_2):
@@ -41,55 +40,3 @@ def convert_to_serology(ser_dict, allele_name, single_al):
     if ':' in single_al and allele_name + '*' + single_al.split(':')[0] in ser_dict:
         return ser_dict[allele_name + '*' + single_al.split(':')[0]].split('*')[1]
     return single_al
-
-# # unused functions (?)
-# def child_ls_merge(child_ls, child_d, alleles_names):
-#     """
-#     merge alleles_names of children to list (ex. [01:03, 08, 01, 08] -> [01:03, 08])
-#     @param child_ls: _child_ list
-#     @param child_d: _child_ dictionary
-#     @param alleles_names: A/B/C/DR/DB
-#     @return: merged list
-#     """
-#     lst = Als()
-#     for _child_ in child_ls:
-#         if any(child_d[_child_][alleles_names]):
-#             # lst = child_d[_child_][alleles_names].merge(lst)
-#             lst = lst.merge(child_d[_child_][alleles_names])
-#     return lst
-#
-#
-# # convert parents chromosomes to list (for writing in file)
-# def options_num_fm(father, mother):
-#     op_lst = []
-#     i = 0
-#     for chro in [father.ch1, father.ch2, mother.ch1, mother.ch2]:
-#         cur_op = 1
-#         for value in chro.values():
-#             if len(value) > 1:
-#                 cur_op = cur_op * len(value)
-#         op_lst.append(cur_op)
-#         i += 1
-#     return op_lst
-#
-#
-# # write the current error to file
-# def errors_report(f_er, count, ind, error_name, fam_id):
-#     count[ind] += 1
-#     f_er.write('family "' + str(fam_id) + '": ' + error_name + '\n')  # write error to errors file
-#
-#
-# def sum_errors(f, er_count, fam_count, inconcis_er, all_err):
-#     f.write('\n\n***** Errors Summary *****' + '\n')
-#     f.write('Errors in pre-processing. Invalid families: ' + str(er_count[0]) +
-#             ' families. ' + "{:.1f}".format(er_count[0] / fam_count * 100) + '%' + ' from data\n')
-#     f.write('Errors in matching. Can not match the children\'s data to the parents\' data: ' + str(er_count[1]) +
-#             ' families. ' + "{:.1f}".format(er_count[1] / fam_count * 100) + '%' + ' from data\n')
-#     f.write('Errors in adding data. Contradiction between the children\'s data and the parents\' data: ' + str(er_count[2]) +
-#             ' families. ' + "{:.1f}".format(er_count[2] / fam_count * 100) + '%' + ' from data\n')
-#     f.write('Errors in creating GL string: ' + str(er_count[3]) +
-#             ' parents. ' + "{:.1f}".format(er_count[3] / fam_count * 50) + '%' + ' from data\n')
-#     f.write('Errors in the results. Inconsistency between the children\'s haplotypes and the parents\' haplotypes: ' + str(inconcis_er) + ' families. ' +
-#             "{:.1f}".format(inconcis_er / int(fam_count) * 100) + '% from data\n')
-#     f.write('\nTotal errors:\n' + str(all_err) + ' from ' + str(fam_count) + ' families\n')
-
