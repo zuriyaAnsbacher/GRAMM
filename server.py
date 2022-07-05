@@ -1,5 +1,6 @@
 import os
 import time
+import pickle
 from random import randint
 from shutil import copy
 from zipfile import ZipFile
@@ -72,6 +73,7 @@ def home():
     global select_m
     global gl_accepted
     global races_manually
+    # global grimm_graph  #--> in remote version add this variable
     error_message = False
     famcode = ""
     is_serology = False
@@ -133,12 +135,12 @@ def home():
                 # run the code
                 res_path, errors_path, run_again = run_all(path2f, ['A', 'B', 'C', 'DRB1', 'DQB1'],
                                                            app.config['UPLOAD_FOLDER'], res_100, is_serology,
-                                                           race_dict, open_ambiguity)
+                                                           race_dict, open_ambiguity) # in remote version add grimm_graph as last argument
                 if run_again:
                     res_100 = True
                     res_path, errors_path, run_again = run_all(path2f, ['A', 'B', 'C', 'DRB1', 'DQB1'],
                                                                app.config['UPLOAD_FOLDER'], res_100, is_serology,
-                                                               race_dict, open_ambiguity)
+                                                               race_dict, open_ambiguity) # in remote version add grimm_graph as last argument
                 race_dict.clear()  # need?
 
                 # create random number for differ files of each user
@@ -182,7 +184,7 @@ def home():
                     os.remove(app.config['UPLOAD_FOLDER'] + "/data2file.csv")
                 if os.path.isfile(app.config['UPLOAD_FOLDER'] + "/user data in gl format.csv"):
                     os.remove(app.config['UPLOAD_FOLDER'] + "/user data in gl format.csv")
-                if os.path.isfile(app.config['UPLOAD_FOLDER'] + "/final.csv"):  # todo: remove the file 'final.csv'?
+                if os.path.isfile(app.config['UPLOAD_FOLDER'] + "/final.csv"):
                     os.remove(app.config['UPLOAD_FOLDER'] + "/final.csv")
                 for filename in os.listdir(app.config['UPLOAD_FOLDER']):
                     if filename.endswith(".png") or filename.endswith(".pdf"):
@@ -280,28 +282,28 @@ def races():
 
 @app.route("/download_example1")
 def download_example1():
-    return send_from_directory(directory="static", filename="example_file1.csv")
+    return send_from_directory(directory="static", filename="example_file1.csv")  # 'filename' to 'path' in new version of Flask (from 2.)
 
 
 @app.route("/download_example2")
 def download_example2():
-    return send_from_directory(directory="static", filename="example_file2.csv")
+    return send_from_directory(directory="static", filename="example_file2.csv")  # as above
 
 
 @app.route("/download_example1_with_races")
 def download_example1_with_races():
-    return send_from_directory(directory="static", filename="example_file1_with_races.csv")
+    return send_from_directory(directory="static", filename="example_file1_with_races.csv")  # as above
 
 
 @app.route("/download_example2_with_races")
 def download_example2_with_races():
-    return send_from_directory(directory="static", filename="example_file2_with_races.csv")
+    return send_from_directory(directory="static", filename="example_file2_with_races.csv")  # as above
 
 
 @app.route("/download_output")
 @app.route("/download_output/<rand_user>")
 def download_output(rand_user):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename="output_to_user" + rand_user + ".zip", as_attachment=True)
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename="output_to_user" + rand_user + ".zip", as_attachment=True)  # as above
 
 
 # clear the cache (to update the visualization in each running)
@@ -319,5 +321,8 @@ def add_header(r):
 
 
 if __name__ == "__main__":
-    # app.run(debug=True)
-    app.run(debug=True, host='0.0.0.0')
+    # in remote version add these lines:
+    # grimm_dir = 'GR_code/GG_GRIMM/'
+    # grimm_graph = pickle.load(open(grimm_dir + 'graph.pkl', 'rb'))
+    app.run(debug=True)
+    # app.run(debug=True, host='0.0.0.0')
