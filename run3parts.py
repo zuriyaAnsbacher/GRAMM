@@ -6,7 +6,7 @@ from GR_code.GG_Post.code.create_results_updated import run_Post_GRIMM
 from GR_code.GG_Post.code.visualization_updated import visualize
 
 
-def run_all(input2GRAMM, alleles_names, files_address, res_100, is_serology, race_dict, open_ambiguity_sim):
+def run_all(input2GRAMM, alleles_names, files_address, res_100, is_serology, race_dict, open_ambiguity_sim):  # in remote version, add last arg: grimm_graph
     """
     called by server, run GRAMM, GRIMM, Post-GRAMM
     :param input2GRAMM: file with input from user (after processing)
@@ -20,6 +20,7 @@ def run_all(input2GRAMM, alleles_names, files_address, res_100, is_serology, rac
         of the families, that have been removed before, to use it in GRAMM
     :return: path to results file, path to errors file, flag that=True if the process did not find any valid results
     """
+
     errors_in_families, aux_tools = run_GRAMM(input2GRAMM, files_address, alleles_names, race_dict,
                                               open_ambiguity_sim, is_serology)
     grimm_path = os.path.abspath("GR_code/GG_GRIMM")
@@ -30,7 +31,7 @@ def run_all(input2GRAMM, alleles_names, files_address, res_100, is_serology, rac
     move(gl2GRIMM, grimm_path + "/validation/simulation/data/input_test.txt")
     move(bin2GRIMM, grimm_path + "/validation/simulation/data/bin_input_test.txt")
 
-    run_GRIMM(res_100)
+    run_GRIMM(res_100)  # in remote version, add second argument: grimm_graph
 
     input2post = grimm_path + "/validation/output/don.hap.freqs"
 
