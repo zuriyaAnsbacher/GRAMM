@@ -75,7 +75,6 @@ def compare_with_connected_hap_and_remove_if_needed(p_als, no_inher_hap, inher_h
             no_inherited_second_par.remove_a(p_als[idx_common])
 
 
-
 def M_hap_is_fuller(hapF_inherited, hapM_inherited, alleles_names):
     """
     check if M haplotype is fuller (= more alleles with values) than F hap.
@@ -107,7 +106,7 @@ def add_child_data(hapF, hapM, child, idx_child, children_num, associating, alle
         _child_ and parent both have 1 value in allele: if contradictory - error, else: insert the value with high resolution
         _child_ has 2 parent has 1: if contradictory - error, else: insert the value with high res, and remove from _child_
         the common allele
-        _child_ has 1 parent has 2: if contradictory - error, else: insert the value with high res, and remove the common
+        _child_ has 1 parent has 2: if contradictory - error, else: insert the value with high res, and remove the non-common
         from parent (+ maybe remove from another haplotype, explained in 'compare_with..._remove_if_needed')
         _child_ has 2 parent has 2: like above, with remove the common allele from _child_
 

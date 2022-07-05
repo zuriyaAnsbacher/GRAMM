@@ -120,6 +120,19 @@ class Als(list):
             # allele that exists in 'self' are equal in the meaning of alleles (like '02' and '02:01'), but not in the
             # regular meaning
 
+    def remove_equal(self, value):
+        """
+        same to "remove_a" but ensure that values are identical.
+        for example, in "remove_a", the values 01, 01:02 are equal, and here they are not.
+        :param value: value to remove
+        """
+        idx_equal = -1
+        for i in range(len(self)):
+            if self[i] == value:
+                idx_equal = i
+        if idx_equal != -1:
+            self.remove(self[idx_equal])
+
     def merge(self, other):
         """
         merge 'other' to 'self', with no repetitions.
@@ -167,7 +180,7 @@ class Als(list):
             return intersection_count, idx_intersection_in_other
 
         for allele in other:
-            if allele in self:
+            if allele != '' and allele in self:  # added: allele != ''
                 intersection_count += 1
                 idx_intersection_in_other = other.index_a(allele)  # if 2 intersections, idx will be the second
         return intersection_count, idx_intersection_in_other
