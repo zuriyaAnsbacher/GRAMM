@@ -44,14 +44,14 @@ def run_Post_GRIMM(input_from_grimm, orig_input, alleles_names, output_path, aux
 
         for key_fam, family_dict in families_dict.items():
             for idx_member, member in family_dict.items():
-                # if idx_member not in ['F', 'M']:  # open to serology only children data # todo: why?
+                # if idx_member not in ['F', 'M']:  # open to serology only children data
                     for allele_name, alleles_values in member.items():
                         for idx_allele, single_allele in enumerate(alleles_values):
                             # we first convert to group name and then open all the options to the group name
                             families_dict[key_fam][idx_member][allele_name][idx_allele] = convert_to_serology(antigen2group,
                                                                                                  allele_name,
                                                                                                  single_allele)
-                    open_serology_options_children(member, alleles_names, group2antigen)  # todo: go over this function
+                    open_serology_options_children(member, alleles_names, group2antigen)
 
     valid, invalid = 0, 0
     valid_list, invalid_list = [], []
@@ -74,7 +74,6 @@ def run_Post_GRIMM(input_from_grimm, orig_input, alleles_names, output_path, aux
             p2_lst = p2_lst[::-1]
 
             max_res2fam = 0
-            # incons_haps = 0
             for pair1 in p1_lst:  # we go over by nested loop on all the pairs combination between father and mother
                 if max_res2fam == 100:  # max results for a family: 100
                     break
@@ -90,7 +89,6 @@ def run_Post_GRIMM(input_from_grimm, orig_input, alleles_names, output_path, aux
 
                     # check consistency between parent (M) and all children
                     if not consistent_haps_par_and_geno_child(pair1, families_dict[key], alleles_names):
-                        # incons_haps += 1
                         continue
 
                     # if fam key already appears in results and the freqs is too low, it won't be added to results:
@@ -132,7 +130,6 @@ def open_serology_options_children(child, alleles_names, s_dict):
     :param alleles_names: alleles names
     :param s_dict: serologu dict
     """
-    # group_of_antigen_to_remove = []
     for i, alleles in enumerate(child):
         for al in child[alleles]:
             group = alleles_names[i] + '*' + al
@@ -143,12 +140,6 @@ def open_serology_options_children(child, alleles_names, s_dict):
             if ":" not in al and group in s_dict:
                 for ser_value in s_dict[group]:
                     child[alleles].append(ser_value.split('*')[1])
-                # if group != "B*14" and group != "B*15" and group != "DRB1*03":  # exceptions. groups and antigens
-                #     group_of_antigen_to_remove.append(group.split('*')[1])
-
-        # for gr_to_remove in group_of_antigen_to_remove:
-        #     child[alleles].remove(gr_to_remove)
-        # group_of_antigen_to_remove = []
 
 
 def consistent_haps_par_and_geno_child(pair, family, alleles_names):
@@ -257,14 +248,14 @@ def valid_family(key, family, p_1, p_2, alleles_names, aux_tools, errors_in_fami
             elif parent_has_empty_hap[key] == 'M':
                 hap_4 = 'Unknown'
 
-        row = [key, hap_1, hap_2, hap_3, hap_4, match_child2haps, freq_1 * freq_2]  # todo check about problematic _child_
+        row = [key, hap_1, hap_2, hap_3, hap_4, match_child2haps, freq_1 * freq_2]
         writer.writerow(row)
         return True
 
     return False
 
 
-def validate(hap_1, hap_2, member, is_serology):  # todo: check it !!
+def validate(hap_1, hap_2, member, is_serology):
     """
     compare two haplotype to person (2 from one parent if compare to parent, and 1 from each parent if compare to _child_)
     :param hap_1: first haplotype
@@ -303,21 +294,6 @@ def validate(hap_1, hap_2, member, is_serology):  # todo: check it !!
         if all(pairs_consistent):
             return True
         return False
-
-    # previous code of no serology. not good
-    #     pairs = list(itertools.combinations(allele_values, 2))  # only relevant to serology, when there are more that 2 options for alleles?
-    #     pairs_consistent = [True] * len(pairs)
-    #
-    #     for k, pair in enumerate(pairs):
-    #         val_member1, val_member2, val_hap1, val_hap2 = pair[0], pair[1], hap_1[allele_name], hap_2[allele_name]
-    #         if not (is_equal(val_member1, val_hap1) and is_equal(val_member2, val_hap2)) \
-    #                 and not (is_equal(val_member1, val_hap2) and is_equal(val_member2, val_hap1)):  # todo: but in serology it failed_count!
-    #             pairs_consistent[k] = False
-    #
-    #     pairs_consistent_opposite = [not element for element in pairs_consistent]
-    #     if any(pairs_consistent_opposite):  # todo - check it. why it's not good if there is at least a single True result?
-    #         return False
-    # return True
 
 
 def is_equal(al_1, al_2):
@@ -362,11 +338,3 @@ def errors_summary_and_writing_to_file(output_path, errors_in_families, families
                                         ' families. ', '{:.1f}'.format(sum_error / families_num * 100),
                                         '% from the data.\n']))
         out_file.write('\nTotal errors:\n' + str(len(all_errors_codes)) + ' from ' + str(families_num) + ' families.\n')
-
-
-# run_Post_GRIMM("/home/zuriya/PycharmProjects/GR_Web/GR_code/GG_GRIMM/validation/output/test.hap.freqs",
-#                "/home/zuriya/PycharmProjects/GR_Web/GR_code/GG_GRAMM/input/reformat_EASY_SIM.csv",
-#                ['A', 'B', 'C', 'DRB1', 'DQB1'], "/home/zuriya/PycharmProjects/GR_Web/GR_code/GG_Post/output",
-#                {'is_serology': False, 'antigen2group': None, 'group2antigen': None, 'amb': {},
-#                 'parent_has_empty_hap': {'2': 'F'}},
-#                {"3": ['All', '6'], "5": ['100023', '8']})
