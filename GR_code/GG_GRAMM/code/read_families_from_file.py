@@ -80,7 +80,6 @@ def process_alleles(pair, allele, aux_tools, id_family, dont_open_ser):
     :param dont_open_ser: True when we read the families in "create_results", so we do not want to convert to serology
     :return: alleles_names pair, after process
     """
-    # TODO: add try-except and error message or error may not occurs?
     amb = aux_tools['amb']  # amb is a dict of ambiguity of alleles_names
     is_serology = aux_tools['is_serology']  # is_serology is boolean (serology samples or genetic)
     ser_dict = aux_tools['antigen2group']  # ser_dict is a dict for the conversion to serology interpretation
@@ -106,9 +105,6 @@ def process_alleles(pair, allele, aux_tools, id_family, dont_open_ser):
             For example: parent: A*02:BJFV, _child_:A*02:02, we will not recognize it could match.
             Before the insertion to GRIMM, we restore it to data.
         """
-        # TODO: right now, the saving of the amb in dict doesn't have identification about the person
-        #  (tiny probability that will be 2 relatives with same ambiguity).
-        #  Maybe need - if I read the whole file at once?
         if ":" in al and al.split(':')[1].isupper():
             if id_family not in amb:
                 amb[id_family] = {}
@@ -126,13 +122,3 @@ def process_alleles(pair, allele, aux_tools, id_family, dont_open_ser):
 
     return new_als
 
-
-# def run_script():
-#     aux_tools_dict = {}
-#     aux_tools_dict['amb'] = {}
-#     aux_tools_dict['is_serology'] = True
-#     with open('/home/zuriya/PycharmProjects/GR_Web/GR_code/GG_GRAMM/data/ser_dict_antigen2group.json') as ser_dict_path_anti2group:
-#         ser_dict_anti2group = json.load(ser_dict_path_anti2group)
-#     aux_tools_dict['ser_dict'] = ser_dict_anti2group
-#
-#     get_families('/home/zuriya/PycharmProjects/GR_Web/static/example_file1.csv', aux_tools_dict)
