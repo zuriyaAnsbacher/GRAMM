@@ -156,7 +156,7 @@ def convert_PED_file_to_columns_file(reader, writer, match_als2col, race_dict):
             if al1.split('*')[0] in match_als2col:
                 col_index = match_als2col[al1.split('*')[0]]
             else:
-                print('Error. The name of the inserted allele is not a name from: A, B, C, DRB1, DQB1')
+                raise KeyError('The name of the inserted allele is not a name from: A, B, C, DRB1, DQB1')
 
             for ind, al in enumerate([al1, al2]):
                 output_line[col_index + ind] = al.split("*")[1]
@@ -223,7 +223,7 @@ def convert_DD_or_Israel_file(reader, writer, match_als2col):
                 if al1.split('*')[0] in match_als2col:
                     col_index = match_als2col[al1.split('*')[0]]
                 else:
-                    print('Error. The name of the inserted allele is not a name from: A, B, C, DRB1, DQB1')
+                    raise KeyError('The name of the inserted allele is not a name from: A, B, C, DRB1, DQB1')
 
                 for ind, al in enumerate([al1, al2]):
                     output_line[col_index + ind] = al.split("*")[1]
