@@ -6,6 +6,6 @@
   "5": "There is an allele in a child that does not exist in the parents.",
   "6": "Less than 4 different alleles in the children. Algorithm can not be executed.",
   "7": "Failed in adding data. Contradiction between the parent and the child.",
-  "8": "Failed in GL string creating.",
-  "9": "Inconsistency between the received parents' haplotypes and the children's HLA (The common reason: recombination)."
+  "8": "Failed in creating GL string.",
+  "9": "Inconsistency between the parents' haplotypes and the children's HLA (Most common reason: recombination)."
 }
