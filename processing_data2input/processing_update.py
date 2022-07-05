@@ -4,12 +4,6 @@ from os import path
 import sys
 import numpy as np
 
-# TODO:
-# 1. in add2file: change function args to list (A1_data etc.) and use it in the writing.need to change also in server.py
-# 2. file in columns format, and file for manual insertion: do not need to be converted to valid file
-# (change the reader for read this format and not the format of 4 columns for each allele)
-# handle with errors in case of insert allele that not one of A, B.. (if key == al1.split('*')[0] (..) else- ?). just printing now
-
 
 def add2file(files_folder, id_person, A1_data, B1_data, C1_data, DRB11_data, DQB11_data, A2_data, B2_data, C2_data,
              DRB12_data, DQB12_data, temp_f):
@@ -58,7 +52,7 @@ def convert_gl_file_to_columns_file(reader, writer, match_als2col, headers, race
             if al1.split('*')[0] in match_als2col:
                 col_index = match_als2col[al1.split('*')[0]]
             else:
-                print('Error. The name of the inserted allele is not a name from: A, B, C, DRB1, DQB1')
+                raise KeyError('The name of the inserted allele is not a name from: A, B, C, DRB1, DQB1')
 
             for ind, al in enumerate([al1, al2]):
                 if "/" in al:  # ambiguity: A*03:01/A*03:02/...
@@ -116,25 +110,6 @@ def save_ambiguity_to_dict(pair_als, open_ambiguity, id_fam, id_person):  # A*03
         # remove duplicates, while keep the order
         open_ambiguity[id_fam][id_person][allele_name][first2_digits] = \
             list(dict.fromkeys(open_ambiguity[id_fam][id_person][allele_name][first2_digits]))
-
-    # if id_fam not in open_ambiguity:
-    #     open_ambiguity[id_fam] = {'A': {}, 'B': {}, 'C': {}, 'DRB1': {}, 'DQB1': {}}
-    #
-    # # assumes the pair_als is 'A*03:01/A*03:02... + A*01:01/A*01:02...'
-    # for allele in pair_als.split('+'):  # A*03:01/A*03:02 ... , A*01:01/A*01:02...
-    #     if allele == '' or 'UUUU' in allele:
-    #         continue
-    #     allele_name = allele.split('*')[0]  # A
-    #     two_first_digits = allele.split(':')[0].split('*')[1]  # 03
-    #     ambiguities = [single.split(':')[1].rstrip() for single in allele.split('/')] # A*03:01/A*03:02/A*03:08 -> [01, 02, 08..]
-    #
-    #     if two_first_digits in open_ambiguity[id_fam][allele_name]:
-    #         open_ambiguity[id_fam][allele_name][two_first_digits].extend(ambiguities)
-    #     else:
-    #         open_ambiguity[id_fam][allele_name][two_first_digits] = ambiguities
-    #
-    #     # remove duplicates, while keep the order
-    #     open_ambiguity[id_fam][allele_name][two_first_digits] = list(dict.fromkeys(open_ambiguity[id_fam][allele_name][two_first_digits]))
 
 
 def convert_PED_file_to_columns_file(reader, writer, match_als2col, race_dict):
@@ -369,33 +344,3 @@ def add_races_from_manual_insertion(race_str, race_dict):
         race_dict['1'] = race_str
     except:
         race_dict.clear()
-
-
-# def main():
-    # basic_csv2format('../running_for_GRAMM_paper/simulations/PEDIGREE_HAPLO_MASTER_EASY.csv',
-    #                  '../running_for_GRAMM_paper/temp_for_check_prepro/sim_EASY_reformat.csv', {})
-    # basic_csv2format('../static/example_file1.csv',
-    #                  '../running_for_GRAMM_paper/temp_for_check_prepro/example_file1_reformat.csv', {})
-    # basic_csv2format('../static/example_file1_with_races.csv',
-    #                  '../running_for_GRAMM_paper/temp_for_check_prepro/example_file1_with_races_reformat.csv', {})
-    # basic_csv2format('../static/example_file2.csv',
-    #                  '../running_for_GRAMM_paper/temp_for_check_prepro/example_file2_reformat.csv', {})
-    # basic_csv2format('../static/example_file2_with_races.csv',
-    #                  '../running_for_GRAMM_paper/temp_for_check_prepro/example_file2_with_races_reformat.csv', {})
-    # basic_csv2format('../running_for_GRAMM_paper/simulations/PEDIGREE_HAPLO_MASTER_LESSEASY.csv',
-    #                  '../running_for_GRAMM_paper/temp_for_check_prepro/sim_LESSEASY_reformat.csv', {})
-
-
-# main()
-
-
-
-
-
-
-
-
-
-
-
-
