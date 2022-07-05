@@ -14,7 +14,6 @@ def run_GRAMM(input_path, out_files_path, alleles_names, races_dict, open_ambigu
     out_GLstr, out_binary = get_files_path(out_files_path)
     low2high, antigen2group, group2antigen = load_jsons()
 
-    # TODO: add explanation on the item in aux_tools
     aux_tools = {'problematic_child': None, 'is_serology': is_serology, 'low2high': low2high,
                  'antigen2group': antigen2group, 'group2antigen': group2antigen, 'amb': {}, 'binary_dict': {},
                  'parent_has_empty_hap': {}}
@@ -25,8 +24,9 @@ def run_GRAMM(input_path, out_files_path, alleles_names, races_dict, open_ambigu
     # sorted keys of families_dict, for process the families in the order (dict is not ordered)
     sorted_keys = sorted(families_dict.keys(), key=lambda my_key: int(my_key))  # check that it sorted
 
-    # TODO: check if 'alleles_names' is changed in the loop and need to create a copy
     for idx_fam in sorted_keys:
+        if idx_fam == '141020':
+            print('-')
 
         family = families_dict[idx_fam]  # get one family
         par_num = check_num_parents(family)
@@ -38,10 +38,9 @@ def run_GRAMM(input_path, out_files_path, alleles_names, races_dict, open_ambigu
 
         remove_duplicate_children(family, alleles_names)
 
-        valid_family = is_valid_family(family, alleles_names, par_num, idx_fam, aux_tools, errors_in_families)  # TODO: add checking format? (mistake in writing). or case that person has one value in an allele?
+        valid_family = is_valid_family(family, alleles_names, par_num, idx_fam, aux_tools, errors_in_families)
         if not valid_family:
             continue  # we do not want to analyze this family, so continue to the next family
-        # TODO: in post-grimm, need to add this _child_ to result file and visualization file
 
         # create dual haplotype for father and mother (without data, yet)
         hapF, hapM = DualHaplotype(alleles_names), DualHaplotype(alleles_names)
@@ -86,7 +85,7 @@ def run_GRAMM(input_path, out_files_path, alleles_names, races_dict, open_ambigu
         if error_in_adding_so_continue_to_next_family:
             continue
 
-        for child in planB:  # explained above (in definition of 'planB') # TODO: check it
+        for child in planB:  # explained above (in definition of 'planB')
             success_adding = do_planB(hapF, hapM, family[child], child, len(children_keys), alleles_names, aux_tools, idx_fam,
                                       errors_in_families)
             if not success_adding:
@@ -101,13 +100,9 @@ def run_GRAMM(input_path, out_files_path, alleles_names, races_dict, open_ambigu
                                                         races_dict, open_ambiguity_sim, errors_in_families)
         # ---------- convert the data in the parents haplotypes to gl string and write to a file ----------/
 
-        if aux_tools['problematic_child']:  # todo: remove
-            print(idx_fam)
-
     # load binary dict to a file
     write_binaries_to_file(out_binary, aux_tools)
 
-    print(errors_in_families)  # todo: remove
 
     return errors_in_families, aux_tools
 
