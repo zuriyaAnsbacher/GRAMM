@@ -1,6 +1,5 @@
 from matplotlib import pyplot as plt
 import matplotlib.patches as patches
-# I installed the latest version of matplotlib. Maybe Lea used another version
 
 
 def visualize(resultsFile, parent_has_empty_hap, output_path):
@@ -67,7 +66,6 @@ def visualize(resultsFile, parent_has_empty_hap, output_path):
                 currentAxis.add_patch(father_hap_rect)
                 currentAxis.add_patch(mother_hap_rect)
 
-
             # create rectangle for each _child_ and add haplotype text
             childs_right = 0.1
             childs_space = 0.02
@@ -121,6 +119,3 @@ def visualize(resultsFile, parent_has_empty_hap, output_path):
         name = output_path + '/1.png'
         plt.savefig(name, dpi=300)
         plt.close('all')
-
-
-# visualize("/home/zuriya/PycharmProjects/GR_Web/output_train/results.csv", "/home/zuriya/PycharmProjects/GR_Web/output_train")
