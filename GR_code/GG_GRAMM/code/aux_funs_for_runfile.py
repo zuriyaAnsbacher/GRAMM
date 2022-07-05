@@ -140,8 +140,9 @@ def write_binaries_to_file(out_binary, aux_tools):
     :param aux_tools: dict which contains the binaries dict
     """
     bin_dict = aux_tools['binary_dict']
-    with open(out_binary, 'w') as file:
-        json.dump(bin_dict, file)
+    if len(bin_dict) > 0:
+        with open(out_binary, 'w') as file:
+            json.dump(bin_dict, file)
 
 
 
