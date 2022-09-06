@@ -229,11 +229,19 @@ def valid_family(key, family, p_1, p_2, alleles_names, aux_tools, errors_in_fami
                 not_valid.append(idx_member)
 
     # second condition for allow one problematic child. (but only if there are at least 2 children)
-    if len(not_valid) == 0 or (len(not_valid) == 1 and not_valid[0] not in ['F', 'M'] and any(['~' in v in valid for v in valid])):
+    one_problematic_child = len(not_valid) == 1 and not_valid[0] not in ['F', 'M'] and any(['~' in v in valid for v in valid])
+    if one_problematic_child:
+        if key in errors_in_families:
+            errors_in_families.append([not_valid[0], '9'])
+        errors_in_families[key] = [not_valid[0], '9']
+    if len(not_valid) == 0 or one_problematic_child:
         match_child2haps = [member for member in valid if '~' in member]  # example: [1=F2~M2, 2=F1~M2 ...]
 
-        if key in errors_in_families and errors_in_families[key][0] != 'All':
-            idx_problematic_child = errors_in_families[key][0]
+        if (key in errors_in_families and errors_in_families[key][0] != 'All') or one_problematic_child:
+            if one_problematic_child:
+                idx_problematic_child = not_valid[0]
+            else:  # problematic because a reason before (in valid family checking)
+                idx_problematic_child = errors_in_families[key][0]
             # _child_ with error (but the rest of the family is valid)
             match_child2haps.append('C' + idx_problematic_child + '=XX~XX')
 
