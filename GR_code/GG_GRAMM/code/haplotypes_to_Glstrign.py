@@ -226,7 +226,7 @@ def single2high(allele, alleles_name, idx_fam, idx_par, open_ambiguity_sim, aux_
         return success, new_allele
     else:
         allele_start = ''.join([alleles_name, '*', allele])
-        if len(options) > 1:
+        if len(options) >= 1:
             new_allele = options_to_gl(options, allele_start)
         return success, new_allele
 
